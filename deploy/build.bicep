@@ -7,13 +7,43 @@ param appinsights_name string
 
 var location = 'westeurope'
 
+targetScope = 'subscription'
+
+resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: resource_group 
+  location: location
+}
+
+// consume the below module declaration in this file, and deploy it to the newly-created rg
+module myMod 'rgcontents' = {
+  name: 'myModule'
+  scope: resourceGroup(rg.name)
+  params: {
+    myTags: {
+      a: 'b'
+    }
+  }
+}
+
+// declare the module in the same file
+moduledecl 'rgcontents' = {
+  targetScope = 'resourceGroup'
+
+  param myTags object = {}
+
+  resource xyz 'My.Rp/a@2020-01-01' = {
+    name: 'xyz'
+    tags: myTags
+    ...
+  }
+}
+
 resource sa 'Microsoft.Storage/storageAccounts@2019-06-01' = {
   name: storage_name
   location: location
   kind: 'StorageV2'
   sku:{
     name: 'Standard_LRS'
-    tier: 'Standard'
   }
 }
 
