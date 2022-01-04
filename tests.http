@@ -4,3 +4,6 @@ GET http://localhost:7071/api/ais-sync-get-wf/triggers/manual/invoke?api-version
 
 ### Test Front door health check for API Management backend
 GET https://aisshared.azurefd.net/apim/health
+
+### 
+GET https://aisshared.azurefd.net/ase/get

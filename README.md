@@ -21,3 +21,5 @@ Deploy a Logic App synchronous pattern VNET isolated in a App Service Environmen
 ```ps1
 ngrok http -host-header=localhost 7071
 ```
+
+have to create nuget project for deployment
