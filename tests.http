@@ -2,18 +2,13 @@
 GET http://localhost:7071/api/ais-sync-get-wf/triggers/manual/invoke?api-version=2020-05-01-preview&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3Lh9dwraEHep2dQMO8LVW8dq0hETbmxfcThMtFfd_Tk
 
 ### Test Front door health check for API Management backend
-<<<<<<< HEAD
 GET https://aisshared.azurefd.net/status-0123456789abcdef
 
 ### Test APIM Public Endpoint (should timeout after setting Network Sercurity Group rule on allowing only Inbound traffic from Front Door to APIM)
 GET https://aisshared.azure-api.net/echo/resource?param1=sample
 
-### Test APIM via Front Door
+### Test APIM Echo API via Front Door
 GET https://aisshared.azurefd.net/echo/resource?param1=sample
 
-=======
-GET https://aisshared.azurefd.net/apim/health
-
-### 
+### Test APIM endpoint with Logic App backend
 GET https://aisshared.azurefd.net/ase/get
->>>>>>> 7f59943c692064c07fd834b0951d6f85e82aff96

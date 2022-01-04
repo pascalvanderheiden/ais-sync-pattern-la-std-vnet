@@ -2,15 +2,6 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "generateDebugSymbols",
-			"command": "dotnet",
-			"args": [
-				"${input:getDebugSymbolDll}"
-			],
-			"type": "process",
-			"problemMatcher": "$msCompile"
-		},
-		{
 			"label": "clean",
 			"command": "dotnet",
 			"args": [
@@ -65,14 +56,19 @@
 			"problemMatcher": "$msCompile"
 		},
 		{
+			"label": "generateDebugSymbols",
+			"command": "dotnet",
+			"args": [
+				"${input:getDebugSymbolDll}"
+			],
+			"type": "process",
+			"problemMatcher": "$msCompile"
+		},
+		{
 			"type": "func",
-			"dependsOn": "build",
-			"options": {
-				"cwd": "${workspaceFolder}/bin/Debug/netcoreapp3.1"
-			},
 			"command": "host start",
-			"isBackground": true,
-			"problemMatcher": "$func-watch"
+			"problemMatcher": "$func-watch",
+			"isBackground": true
 		}
 	],
 	"inputs": [

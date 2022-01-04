@@ -1,8 +1,8 @@
 # ais-sync-pattern-la-std-vnet
 
-Deploy a Logic App synchronous pattern VNET isolated in a App Service Environment exposed via Front Door and API Management.
+Deploy a Logic App synchronous pattern VNET isolated in a App Service Environment exposed via Front Door and API Management. This deployment can be done by Github Actions or Azure DevOps.
 
-To setup API Management with Azure Front Door, you can use this [deployment script](https://github.com/Azure/azure-quickstart-templates/tree/master/quickstarts/microsoft.network/front-door-api-management).
+To setup API Management with Azure Front Door, I used this [deployment script](https://github.com/Azure/azure-quickstart-templates/tree/master/quickstarts/microsoft.network/front-door-api-management).
 
 I also used [this blog](https://techcommunity.microsoft.com/t5/azure-paas-blog/integrate-azure-front-door-with-azure-api-management/ba-p/2654925) to get more insights on the process.
 
@@ -12,11 +12,14 @@ In my journey I ran into some networking related issue's. When you are deploying
 
 ## Architecture
 
+![ais-dapr-apim](docs/images/arch.png)
+
 ## Prerequisites
 
-* Install Visual Studio Code [Visual Studio Code](https://code.visualstudio.com/download)
-* Install Azure Logic Apps (Standard) Extension for VSCode [Azure Logic Apps (Standard)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurelogicapps)
-* Install Azurite Extension for VSCode [Azurite](https://marketplace.visualstudio.com/items?itemName=Azurite.azurite)
+* Install [Visual Studio Code](https://code.visualstudio.com/download)
+* Install [Azure Logic Apps (Standard)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurelogicapps) Extension for Visual Studio Code.
+* Install [Azurite](https://marketplace.visualstudio.com/items?itemName=Azurite.azurite) Extension for Visual Studio Code.
+* Install [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) Extension for Visual Studio Code.
 * Install Chocolatey (package manager)
 
 ```ps1
@@ -36,14 +39,3 @@ choco install dotnetcore-sdk --params "'/x64'"
 ```
 
 ## Setup
-
-<<<<<<< HEAD
-=======
-* Using Ngrok to expose port 7071 accessible over the internet
-
-```ps1
-ngrok http -host-header=localhost 7071
-```
-
-have to create nuget project for deployment
->>>>>>> 7f59943c692064c07fd834b0951d6f85e82aff96
