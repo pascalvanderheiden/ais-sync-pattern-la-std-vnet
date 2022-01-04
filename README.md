@@ -37,3 +37,13 @@ choco install dotnetcore-sdk --params "'/x64'"
 
 ## Setup
 
+<<<<<<< HEAD
+=======
+* Using Ngrok to expose port 7071 accessible over the internet
+
+```ps1
+ngrok http -host-header=localhost 7071
+```
+
+have to create nuget project for deployment
+>>>>>>> 7f59943c692064c07fd834b0951d6f85e82aff96
