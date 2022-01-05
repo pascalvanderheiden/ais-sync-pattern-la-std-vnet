@@ -1,6 +1,6 @@
 @minLength(3)
 @maxLength(11)
-param storagePrefix string
+param namePrefix string
 
 @allowed([
   'Standard_LRS'
@@ -16,7 +16,7 @@ param storageSKU string = 'Standard_LRS'
 
 param location string
 
-var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
+var uniqueStorageName = '${namePrefix}${uniqueString(resourceGroup().id)}st01'
 
 resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: uniqueStorageName
@@ -30,4 +30,5 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   }
 }
 
-output storageEndpoint object = stg.properties.primaryEndpoints
+output storageName string = stg.name
+output storageEndpoint string = stg.properties.primaryEndpoints.blob

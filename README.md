@@ -38,4 +38,39 @@ choco install azure-functions-core-tools-3 --params "'/x64'"
 choco install dotnetcore-sdk --params "'/x64'"
 ```
 
-## Setup
+* Install Bicep CLI
+
+```ps1
+choco install bicep
+```
+
+* Install Az Module in PowerShell
+
+```ps1
+Install-Module -Name Az -AllowClobber -Scope CurrentUser
+```
+
+## Deploy Manually
+
+* Git Clone the repository
+
+```ps1
+git clone https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet.git
+```
+
+* Connect with Azure and set the Subscription to deploy resources to.
+
+```ps1
+Connect-AzAccount
+Set-AzContext -Subscription "xxxx-xxxx-xxxx-xxxx"
+```
+
+* Deploy Azure services
+
+```ps1
+New-AzSubscriptionDeployment -namePrefix "<project_prefix>" -Location "West Europe" -TemplateFile "<path-to-bicep>"
+```
+
+## Deploy via Github Actions
+
+## Deploy via Azure DevOps
