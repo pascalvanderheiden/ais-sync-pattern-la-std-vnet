@@ -1,29 +1,25 @@
-param frontDoorName string = 'AzFd-TestingBicep-999'
-param frontDoorEnabledState bool = true
-param healthProbe1EnabledState bool = false
-param frontDoorWafNamePrefix string = 'AzFdWafTestingBicep'
-param frontDoorWafEnabledState bool = true
+@minLength(3)
+@maxLength(11)
+param namePrefix string
+param apimGwUrl string
 
-@allowed([
-  'Prevention'
-  'Detection'
-])
-param frontDoorWafMode string = 'Prevention'
+var frontDoorEnabledState = true
+var healthProbe1EnabledState = true
+var frontDoorWafEnabledState = true
+var frontDoorWafMode = 'Detection'
 
+var frontDoorName = '${namePrefix}-fd'
+var frontDoorWafName = '${namePrefix}policywaf'
 var frontDoorNameLower = toLower(frontDoorName)
-var backendPool1Name = '${frontDoorNameLower}-backendPool1'
 
-var healthProbe1Name = '${frontDoorNameLower}-healthProbe1'
-var frontendEndpoint1Name = '${frontDoorNameLower}-frontendEndpoint1'
-var loadBalancing1Name = '${frontDoorNameLower}-loadBalancing1'
-var routingRule1Name = '${frontDoorNameLower}-routingRule1'
-var routingRule2Name = '${frontDoorNameLower}-routingRule2'
+var backendPool1Name = '${frontDoorNameLower}-apimBackendPool1'
+var healthProbe1Name = '${frontDoorNameLower}-apimHealthProbe1'
+var frontendEndpoint1Name = '${frontDoorNameLower}-apimFrontendEndpoint1'
+var loadBalancing1Name = '${frontDoorNameLower}-apimLoadBalancing1'
+var routingRule1Name = '${frontDoorNameLower}-apimRoutingRule1'
 
 var frontendEndpoint1hostName = '${frontDoorNameLower}.azurefd.net'
-var backendExampleTarget = 'api.myip.com'
-var redirectExampleTarget = 'api.myip.com'
-
-var frontDoorWafName = '${frontDoorWafNamePrefix}${uniqueString(subscription().subscriptionId, resourceGroup().id, frontDoorWafNamePrefix)}'
+var backendPool1TargetUrl = apimGwUrl
 
 resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
   name: frontDoorNameLower
@@ -54,8 +50,8 @@ resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
         properties: {
           backends: [
             {
-              address: backendExampleTarget
-              backendHostHeader: backendExampleTarget
+              address: backendPool1TargetUrl
+              backendHostHeader: backendPool1TargetUrl
               enabledState: 'Enabled'
               httpPort: 80
               httpsPort: 443
@@ -74,13 +70,13 @@ resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
     ]
     healthProbeSettings: [
       {
-        name: healthProbe1Name
+        name: '${frontDoorNameLower}${healthProbe1Name}'
         properties: {
-          enabledState: healthProbe1EnabledState ? 'Enabled' : 'Disabled'
-          intervalInSeconds: 30
-          path: '/'
-          protocol: 'Https'
-          healthProbeMethod: 'HEAD'
+            path: '/status-0123456789abcdef'
+            protocol: 'Https'
+            intervalInSeconds: 30
+            enabledState: healthProbe1EnabledState ? 'Enabled' : 'Disabled'
+            healthProbeMethod: 'GET'
         }
       }
     ]
@@ -119,31 +115,6 @@ resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
           }
         }
       }
-      {
-        name: routingRule2Name
-        properties: {
-          frontendEndpoints: [
-            {
-              id: resourceId('Microsoft.Network/frontDoors/FrontendEndpoints', frontDoorNameLower, frontendEndpoint1Name)
-            }
-          ]
-          acceptedProtocols: [
-            'Https'
-          ]
-          patternsToMatch: [
-            '/redirect/*'
-            '/redirect'
-          ]
-          enabledState: 'Enabled'
-          routeConfiguration: {
-            '@odata.type': '#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration'
-            customHost: redirectExampleTarget
-            customPath: '/'
-            redirectProtocol: 'HttpsOnly'
-            redirectType: 'Found'
-          }
-        }
-      }
     ]
   }
 }
@@ -158,17 +129,43 @@ resource resAzFdWaf 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2
       customBlockResponseStatusCode: 403
     }
     customRules: {
-      rules: []
+      rules: [
+        {
+          name: 'blockQsExample'
+          enabledState: 'Enabled'
+          priority: 4
+          ruleType: 'MatchRule'
+          rateLimitDurationInMinutes: 1
+          rateLimitThreshold: 100
+          matchConditions: [
+              {
+                  matchVariable: 'QueryString'
+                  operator: 'Contains'
+                  negateCondition: false
+                  matchValue: [
+                      'blockme'
+                  ]
+                  transforms: []
+              }
+          ]
+          action: 'Block'
+        }
+      ]
     }
     managedRules: {
       managedRuleSets: [
         {
           ruleSetType: 'DefaultRuleSet'
           ruleSetVersion: '1.0'
-          ruleGroupOverrides: []
-          exclusions: []
+        }
+        {
+          ruleSetType: 'BotProtection'
+          ruleSetVersion: 'preview-0.1'
         }
       ]
     }
   }
 }
+
+output frontDoorName string = resAzFd.name
+output frontDoorWafName string = resAzFdWaf.name

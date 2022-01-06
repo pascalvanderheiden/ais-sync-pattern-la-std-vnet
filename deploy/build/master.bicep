@@ -18,7 +18,7 @@ resource newRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 }
 
 // Create a Storage Account
-module stgModule '../deploy/storage.bicep' = {
+module stgModule '../build/storage.bicep' = {
   name: 'storageDeploy'
   scope: newRG
   params: {
@@ -30,8 +30,8 @@ module stgModule '../deploy/storage.bicep' = {
 output storageName string = stgModule.outputs.storageName
 output storageEndpoint string = stgModule.outputs.storageEndpoint
 
-// Create a Virtual Network
-module vnetModule '../deploy/vnet_nsg.bicep' = {
+// Create a Virtual Network & Network Sercurity Groups
+module vnetModule '../build/vnet_nsg.bicep' = {
   name: 'vnetDeploy'
   scope: newRG
   params: {
@@ -40,13 +40,13 @@ module vnetModule '../deploy/vnet_nsg.bicep' = {
   }
 }
 
-output vnetId string = vnetModule.outputs.virtualNetworkId
 output subnetNameApim string = vnetModule.outputs.subnet2Name
+var vnetId = vnetModule.outputs.virtualNetworkId
 var subnetResourceIdApim = vnetModule.outputs.subnet2ResourceId
-output subnetNameAse string = vnetModule.outputs.subnet3Name
+var subnetNameAse = vnetModule.outputs.subnet3Name
 
-// Create Application Insights
-module appInsightsModule '../deploy/appInsights.bicep' = {
+// Create Application Insights & Log Analytics Workspace
+module appInsightsModule '../build/appInsights_loganalytics.bicep' = {
   name: 'appInsightsDeploy'
   scope: newRG
   params: {
@@ -58,9 +58,10 @@ module appInsightsModule '../deploy/appInsights.bicep' = {
 output appInsightsName string = appInsightsModule.outputs.appInsightsName
 output appInsightsId string = appInsightsModule.outputs.appInsightsId
 output appInsightsInstrKey string = appInsightsModule.outputs.appInsightsInstrKey
+output logAnalyticsWorkspaceName string = appInsightsModule.outputs.logAnalyticsWorkspaceName
 
 // Create API Management instance
-module apimModule '../deploy/apim.bicep' = {
+module apimModule '../build/apim.bicep' = {
   name: 'apimDeploy'
   scope: newRG
   params: {
@@ -72,4 +73,37 @@ module apimModule '../deploy/apim.bicep' = {
     subnetResourceId: subnetResourceIdApim
   }
 }
+
+output apimName string = apimModule.outputs.apimName
+var apimGwUrl = apimModule.outputs.apimGwUrl
+
+// Create Frontdoor
+module frontDoorModule '../build/frontdoor_waf.bicep' = {
+  name: 'frontDoorDeploy'
+  scope: newRG
+  params: {
+    namePrefix: namePrefix
+    apimGwUrl: apimGwUrl
+  }
+}
+
+output frontDoorName string = frontDoorModule.outputs.frontDoorName
+output frontDoorWafName string = frontDoorModule.outputs.frontDoorWafName
+
+// Create App Service Environment V3 & App Service Plan
+module aseModule '../build/asev3_asp.bicep' = {
+  name: 'aseDeploy'
+  scope: newRG
+  params: {
+    namePrefix: namePrefix
+    location: location
+    virtualNetworkId: vnetId
+    subnetName: subnetNameAse
+  }
+}
+
+output aseName string = aseModule.outputs.aseName
+output appServicePlanName string = aseModule.outputs.appServicePlanName
+
+// Create Logic Apps (Standard)
 

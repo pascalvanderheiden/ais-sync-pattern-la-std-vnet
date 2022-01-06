@@ -39,3 +39,6 @@ resource apiManagement 'Microsoft.ApiManagement/service@2020-12-01' = {
     type: 'SystemAssigned'
   }
 }
+
+output apimName string = apiManagement.name
+output apimGwUrl string = apiManagement.properties.gatewayUrl
