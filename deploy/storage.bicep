@@ -1,7 +1,6 @@
 @minLength(3)
 @maxLength(11)
 param namePrefix string
-
 @allowed([
   'Standard_LRS'
   'Standard_GRS'
@@ -13,7 +12,6 @@ param namePrefix string
   'Standard_RAGZRS'
 ])
 param storageSKU string = 'Standard_LRS'
-
 param location string
 
 var uniqueStorageName = '${namePrefix}${uniqueString(resourceGroup().id)}st01'

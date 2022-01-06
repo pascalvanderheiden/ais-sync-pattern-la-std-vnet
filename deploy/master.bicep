@@ -45,6 +45,20 @@ output subnetNameApim string = vnetModule.outputs.subnet2Name
 var subnetResourceIdApim = vnetModule.outputs.subnet2ResourceId
 output subnetNameAse string = vnetModule.outputs.subnet3Name
 
+// Create Application Insights
+module appInsightsModule '../deploy/appInsights.bicep' = {
+  name: 'appInsightsDeploy'
+  scope: newRG
+  params: {
+    namePrefix: namePrefix
+    location: location
+  }
+}
+
+output appInsightsName string = appInsightsModule.outputs.appInsightsName
+output appInsightsId string = appInsightsModule.outputs.appInsightsId
+output appInsightsInstrKey string = appInsightsModule.outputs.appInsightsInstrKey
+
 // Create API Management instance
 module apimModule '../deploy/apim.bicep' = {
   name: 'apimDeploy'
@@ -58,3 +72,4 @@ module apimModule '../deploy/apim.bicep' = {
     subnetResourceId: subnetResourceIdApim
   }
 }
+

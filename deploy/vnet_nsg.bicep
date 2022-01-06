@@ -1,16 +1,17 @@
+@minLength(3)
+@maxLength(11)
 param namePrefix string
 param location string = resourceGroup().location
 
 var virtualNetworkName = '${namePrefix}-vnet'
-var nsgApimName = '${namePrefix}-vnet-apim-nsg'
-var nsgAseName = '${namePrefix}-vnet-ase-nsg'
-
 var subnet1Name = 'default'
 var subnet2Name = 'apim' //seperate subnet for API Management
 var subnet3Name = 'ase' //seperate subnet for the App Service Environment
+var nsgSubnet2Name = '${namePrefix}-vnet-${subnet2Name}-nsg'
+var nsgSubnet3Name = '${namePrefix}-vnet-${subnet3Name}-nsg'
 
-resource nsgApim 'Microsoft.Network/networkSecurityGroups@2020-07-01' = {
-  name: nsgApimName
+resource nsgSubnet2 'Microsoft.Network/networkSecurityGroups@2020-07-01' = {
+  name: nsgSubnet2Name
   location: location
   tags: {}
   properties: {
@@ -18,27 +19,81 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2020-07-01' = {
       {
         name: 'AllowAPIMPortal'
         properties: {
-          access: 'Allow'
-          destinationPortRange: '3443'
-          direction: 'Inbound'
-          protocol: 'Tcp'
-          sourceAddressPrefix: ''
-          sourceAddressPrefixes: [
-            'string'
-          ]
-          sourcePortRange: '*'
+            protocol: 'Tcp'
+            sourcePortRange: '*'
+            destinationPortRange: '3443'
+            sourceAddressPrefix: 'ApiManagement'
+            destinationAddressPrefix: 'VirtualNetwork'
+            access: 'Allow'
+            priority: 2721
+            direction: 'Inbound'
         }
+      }
+      {
+          name: 'AllowVnetStorage'
+          properties: {
+              protocol: '*'
+              sourcePortRange: '*'
+              destinationPortRange: '443'
+              sourceAddressPrefix: 'VirtualNetwork'
+              destinationAddressPrefix: 'Storage'
+              access: 'Allow'
+              priority: 2731
+              direction: 'Outbound'
+          }
+      }
+      {
+          name: 'AllowVnetMonitor'
+          properties: {
+              protocol: '*'
+              sourcePortRange: '*'
+              sourceAddressPrefix: 'VirtualNetwork'
+              destinationAddressPrefix: 'AzureMonitor'
+              access: 'Allow'
+              priority: 2741
+              direction: 'Outbound'
+              destinationPortRanges: [
+                  '1886'
+                  '443'
+              ]
+          }
+      }
+      {
+          name: 'AllowAPIMLoadBalancer'
+          properties: {
+              protocol: '*'
+              sourcePortRange: '*'
+              destinationPortRange: '6390'
+              sourceAddressPrefix: 'AzureLoadBalancer'
+              destinationAddressPrefix: 'VirtualNetwork'
+              access: 'Allow'
+              priority: 2751
+              direction: 'Inbound'
+          }
+      }
+      {
+          name: 'AllowAPIMFrontdoor'
+          properties: {
+              protocol: 'Tcp'
+              sourcePortRange: '*'
+              destinationPortRange: '443'
+              sourceAddressPrefix: 'AzureFrontDoor.Backend'
+              destinationAddressPrefix: 'VirtualNetwork'
+              access: 'Allow'
+              priority: 2761
+              direction: 'Inbound'
+          }
       }
     ]
   }
 }
 
-resource nsgAse 'Microsoft.Network/networkSecurityGroups@2020-07-01' = {
-  name: nsgAseName
+resource nsgSubnet3 'Microsoft.Network/networkSecurityGroups@2020-07-01' = {
+  name: nsgSubnet3Name
   location: location
   tags: {}
   properties: {
-    securityRules: // Security Rules
+    securityRules: []
   }
 }
 
@@ -62,16 +117,18 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         name: subnet2Name
         properties: {
           addressPrefix: '10.0.1.0/24'
-          networkSecurityGroup: nsgApim.id == '' ? null : {
-            id: nsgId
+          networkSecurityGroup: nsgSubnet2.id == '' ? null : {
+            id: nsgSubnet2.id 
+          }
         }
       }
       {
         name: subnet3Name
         properties: {
           addressPrefix: '10.0.2.0/24'
-          networkSecurityGroup: nsgAse.id == '' ? null : {
-            id: nsgId
+          networkSecurityGroup: nsgSubnet3.id == '' ? null : {
+            id: nsgSubnet3.id
+          }
         }
       }
     ]
