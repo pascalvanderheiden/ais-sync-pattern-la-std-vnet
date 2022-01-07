@@ -106,4 +106,11 @@ output aseName string = aseModule.outputs.aseName
 output appServicePlanName string = aseModule.outputs.appServicePlanName
 
 // Create Logic Apps (Standard)
-
+module logicAppModule '../build/logicapp.bicep' = {
+  name: 'logicAppDeploy'
+  scope: newRG
+  params: {
+    namePrefix: namePrefix
+    location: location
+  }
+}
