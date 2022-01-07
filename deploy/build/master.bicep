@@ -47,7 +47,7 @@ module appInsightsModule '../build/appinsights_loganalytics.bicep' = {
   }
 }
 
-// Create App Service Environment V3 & App Service Plan
+// Create App Service Environment & App Service Plan
 module aseModule '../build/ase_asp.bicep' = {
   name: 'aseDeploy'
   scope: newRG
