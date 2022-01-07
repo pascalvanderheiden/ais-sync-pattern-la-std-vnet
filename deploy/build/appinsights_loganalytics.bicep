@@ -11,7 +11,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-10
   location: location
   properties: {
     sku: {
-      name: 'Free'
+      name: 'PerGB2018'
     }
   }
 }
@@ -29,4 +29,5 @@ resource appinsights 'Microsoft.Insights/components@2020-02-02-preview' = {
 output appInsightsName string = appinsights.name
 output appInsightsId string = appinsights.id
 output appInsightsInstrKey string = appinsights.properties.InstrumentationKey
+output appInsightsEndpoint string = appinsights.properties.ConnectionString
 output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name

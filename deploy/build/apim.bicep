@@ -16,6 +16,8 @@ param sku string = 'Developer'
 param skuCount int = 1
 param location string = resourceGroup().location
 param subnetResourceId string
+param appInsightsName string
+param appInsightsInstrKey string
 
 var uniqueApimName = '${namePrefix}${uniqueString(resourceGroup().id)}apim'
 
@@ -37,6 +39,18 @@ resource apiManagement 'Microsoft.ApiManagement/service@2020-12-01' = {
   }
   identity: {
     type: 'SystemAssigned'
+  }
+}
+
+resource apiManagementLogger 'Microsoft.ApiManagement/service/loggers@2020-12-01' = {
+  name: appInsightsName
+  parent: apiManagement
+  properties: {
+    loggerType: 'applicationInsights'
+    description: 'Logger resources to APIM'
+    credentials: {
+      instrumentationKey: appInsightsInstrKey
+    }
   }
 }
 

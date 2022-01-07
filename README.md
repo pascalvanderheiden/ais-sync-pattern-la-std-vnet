@@ -67,10 +67,10 @@ Connect-AzAccount
 Set-AzContext -Subscription "xxxx-xxxx-xxxx-xxxx"
 ```
 
-* Deploy Azure services
+* Deploy Azure services (refer to the location of the master.bicep file)
 
 ```ps1
-New-AzSubscriptionDeployment -namePrefix "<project_prefix>" -Location "West Europe" -TemplateFile "<path-to-bicep>"
+New-AzSubscriptionDeployment -name "<deployment_name>" -namePrefix "<project_prefix>" -Location "West Europe" -TemplateFile "<path-to-bicep>" -AsJob
 ```
 
 ## Deploy via Github Actions

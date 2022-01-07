@@ -27,9 +27,6 @@ module stgModule '../build/storage.bicep' = {
   }
 }
 
-output storageName string = stgModule.outputs.storageName
-output storageEndpoint string = stgModule.outputs.storageEndpoint
-
 // Create a Virtual Network & Network Sercurity Groups
 module vnetModule '../build/vnet_nsg.bicep' = {
   name: 'vnetDeploy'
@@ -39,11 +36,6 @@ module vnetModule '../build/vnet_nsg.bicep' = {
     location: location
   }
 }
-
-output subnetNameApim string = vnetModule.outputs.subnet2Name
-var vnetId = vnetModule.outputs.virtualNetworkId
-var subnetResourceIdApim = vnetModule.outputs.subnet2ResourceId
-var subnetNameAse = vnetModule.outputs.subnet3Name
 
 // Create Application Insights & Log Analytics Workspace
 module appInsightsModule '../build/appInsights_loganalytics.bicep' = {
@@ -55,11 +47,6 @@ module appInsightsModule '../build/appInsights_loganalytics.bicep' = {
   }
 }
 
-output appInsightsName string = appInsightsModule.outputs.appInsightsName
-output appInsightsId string = appInsightsModule.outputs.appInsightsId
-output appInsightsInstrKey string = appInsightsModule.outputs.appInsightsInstrKey
-output logAnalyticsWorkspaceName string = appInsightsModule.outputs.logAnalyticsWorkspaceName
-
 // Create API Management instance
 module apimModule '../build/apim.bicep' = {
   name: 'apimDeploy'
@@ -70,25 +57,16 @@ module apimModule '../build/apim.bicep' = {
     publisherName: 'Me Company Ltd.'
     sku: 'Developer'
     location: location
-    subnetResourceId: subnetResourceIdApim
+    subnetResourceId: vnetModule.outputs.subnet2ResourceId
+    appInsightsName: appInsightsModule.outputs.appInsightsName
+    appInsightsInstrKey: appInsightsModule.outputs.appInsightsInstrKey
   }
+  dependsOn:[
+    appInsightsModule
+    vnetModule
+    stgModule
+  ]
 }
-
-output apimName string = apimModule.outputs.apimName
-var apimGwUrl = apimModule.outputs.apimGwUrl
-
-// Create Frontdoor
-module frontDoorModule '../build/frontdoor_waf.bicep' = {
-  name: 'frontDoorDeploy'
-  scope: newRG
-  params: {
-    namePrefix: namePrefix
-    apimGwUrl: apimGwUrl
-  }
-}
-
-output frontDoorName string = frontDoorModule.outputs.frontDoorName
-output frontDoorWafName string = frontDoorModule.outputs.frontDoorWafName
 
 // Create App Service Environment V3 & App Service Plan
 module aseModule '../build/asev3_asp.bicep' = {
@@ -97,16 +75,13 @@ module aseModule '../build/asev3_asp.bicep' = {
   params: {
     namePrefix: namePrefix
     location: location
-    virtualNetworkId: vnetId
-    subnetName: subnetNameAse
+    virtualNetworkId: vnetModule.outputs.virtualNetworkId
+    subnetName: vnetModule.outputs.subnet3Name
   }
+  dependsOn:[
+    vnetModule
+  ]
 }
-
-output aseName string = aseModule.outputs.aseName
-var aseDomainName = aseModule.outputs.aseDomainName
-var aseExtId = aseModule.outputs.aseExtId
-output appServicePlanName string = aseModule.outputs.appServicePlanName
-var appServicePlanExtId = aseModule.outputs.appServicePlanExtId
 
 // Create Logic Apps (Standard)
 module logicAppModule '../build/logicapp.bicep' = {
@@ -115,10 +90,30 @@ module logicAppModule '../build/logicapp.bicep' = {
   params: {
     namePrefix: namePrefix
     location: location
-    appServicePlanExtId: appServicePlanExtId
-    aseExtId: aseExtId
-    aseDomainName: aseDomainName
+    appServicePlanExtId: aseModule.outputs.appServicePlanExtId
+    aseExtId: aseModule.outputs.aseExtId
+    aseDomainName: aseModule.outputs.aseDomainName
+    appInsightsInstrKey: appInsightsModule.outputs.appInsightsInstrKey
+    appInsightsEndpoint: appInsightsModule.outputs.appInsightsEndpoint
+    storageEndpoint: stgModule.outputs.storageEndpoint
   }
+  dependsOn:[
+    aseModule
+    stgModule
+    appInsightsModule
+  ]
 }
 
-output logicAppName string = logicAppModule.outputs.LogicAppName
+// Create Frontdoor
+module frontDoorModule '../build/frontdoor_waf.bicep' = {
+  name: 'frontDoorDeploy'
+  scope: newRG
+  params: {
+    namePrefix: namePrefix
+    apimGwUrl: apimModule.outputs.apimGwUrl
+  }
+  dependsOn:[
+    apimModule
+    vnetModule
+  ]
+}
