@@ -103,7 +103,10 @@ module aseModule '../build/asev3_asp.bicep' = {
 }
 
 output aseName string = aseModule.outputs.aseName
+var aseDomainName = aseModule.outputs.aseDomainName
+var aseExtId = aseModule.outputs.aseExtId
 output appServicePlanName string = aseModule.outputs.appServicePlanName
+var appServicePlanExtId = aseModule.outputs.appServicePlanExtId
 
 // Create Logic Apps (Standard)
 module logicAppModule '../build/logicapp.bicep' = {
@@ -112,5 +115,10 @@ module logicAppModule '../build/logicapp.bicep' = {
   params: {
     namePrefix: namePrefix
     location: location
+    appServicePlanExtId: appServicePlanExtId
+    aseExtId: aseExtId
+    aseDomainName: aseDomainName
   }
 }
+
+output logicAppName string = logicAppModule.outputs.LogicAppName

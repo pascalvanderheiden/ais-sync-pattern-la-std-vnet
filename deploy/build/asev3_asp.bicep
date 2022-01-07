@@ -47,4 +47,7 @@ resource serverFarm 'Microsoft.Web/serverfarms@2020-06-01' = {
 }
 
 output aseName string = hostingEnvironment.name
+output aseDomainName string = hostingEnvironment.properties.dnsSuffix
+output aseExtId string = hostingEnvironment.id
 output appServicePlanName string = serverFarm.name
+output appServicePlanExtId string = serverFarm.id
