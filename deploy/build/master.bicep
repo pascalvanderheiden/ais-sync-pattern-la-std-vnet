@@ -47,29 +47,8 @@ module appInsightsModule '../build/appInsights_loganalytics.bicep' = {
   }
 }
 
-// Create API Management instance
-module apimModule '../build/apim.bicep' = {
-  name: 'apimDeploy'
-  scope: newRG
-  params: {
-    namePrefix: namePrefix
-    publisherEmail: 'me@example.com'
-    publisherName: 'Me Company Ltd.'
-    sku: 'Developer'
-    location: location
-    subnetResourceId: vnetModule.outputs.subnet2ResourceId
-    appInsightsName: appInsightsModule.outputs.appInsightsName
-    appInsightsInstrKey: appInsightsModule.outputs.appInsightsInstrKey
-  }
-  dependsOn:[
-    appInsightsModule
-    vnetModule
-    stgModule
-  ]
-}
-
 // Create App Service Environment V3 & App Service Plan
-module aseModule '../build/asev3_asp.bicep' = {
+module aseModule '../build/ase_asp.bicep' = {
   name: 'aseDeploy'
   scope: newRG
   params: {
@@ -104,13 +83,34 @@ module logicAppModule '../build/logicapp.bicep' = {
   ]
 }
 
+// Create API Management instance
+module apimModule '../build/apim.bicep' = {
+  name: 'apimDeploy'
+  scope: newRG
+  params: {
+    namePrefix: namePrefix
+    publisherEmail: 'me@example.com'
+    publisherName: 'Me Company Ltd.'
+    sku: 'Developer'
+    location: location
+    subnetResourceId: vnetModule.outputs.subnet2ResourceId
+    appInsightsName: appInsightsModule.outputs.appInsightsName
+    appInsightsInstrKey: appInsightsModule.outputs.appInsightsInstrKey
+  }
+  dependsOn:[
+    appInsightsModule
+    vnetModule
+    stgModule
+  ]
+}
+
 // Create Frontdoor
 module frontDoorModule '../build/frontdoor_waf.bicep' = {
   name: 'frontDoorDeploy'
   scope: newRG
   params: {
     namePrefix: namePrefix
-    apimGwUrl: apimModule.outputs.apimGwUrl
+    apimGwUrl: '${apimModule.outputs.apimName}.azure-api.net'
   }
   dependsOn:[
     apimModule

@@ -63,14 +63,14 @@ resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
             id: resourceId('Microsoft.Network/frontDoors/healthProbeSettings', frontDoorNameLower, healthProbe1Name)
           }
           loadBalancingSettings: {
-            id: resourceId('Microsoft.Network/frontDoors/LoadBalancingSettings', frontDoorNameLower, loadBalancing1Name)
+            id: resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', frontDoorNameLower, loadBalancing1Name)
           }
         }
       }
     ]
     healthProbeSettings: [
       {
-        name: '${frontDoorNameLower}${healthProbe1Name}'
+        name: healthProbe1Name
         properties: {
             path: '/status-0123456789abcdef'
             protocol: 'Https'
@@ -84,7 +84,6 @@ resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
       {
         name: loadBalancing1Name
         properties: {
-          additionalLatencyMilliseconds: 0
           sampleSize: 4
           successfulSamplesRequired: 2
         }

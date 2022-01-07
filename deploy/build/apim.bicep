@@ -19,7 +19,7 @@ param subnetResourceId string
 param appInsightsName string
 param appInsightsInstrKey string
 
-var uniqueApimName = '${namePrefix}${uniqueString(resourceGroup().id)}apim'
+var uniqueApimName = '${namePrefix}${uniqueString(resourceGroup().id)}-apim'
 
 resource apiManagement 'Microsoft.ApiManagement/service@2020-12-01' = {
   name: uniqueApimName
@@ -55,4 +55,3 @@ resource apiManagementLogger 'Microsoft.ApiManagement/service/loggers@2020-12-01
 }
 
 output apimName string = apiManagement.name
-output apimGwUrl string = apiManagement.properties.gatewayUrl

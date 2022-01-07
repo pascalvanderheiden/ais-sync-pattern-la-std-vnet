@@ -73,6 +73,12 @@ Set-AzContext -Subscription "xxxx-xxxx-xxxx-xxxx"
 New-AzSubscriptionDeployment -name "<deployment_name>" -namePrefix "<project_prefix>" -Location "West Europe" -TemplateFile "<path-to-bicep>" -AsJob
 ```
 
+* Check on the status of the deployment
+
+```ps1
+Get-AzSubscriptionDeployment -Name "<deployment_name>"
+```
+
 ## Deploy via Github Actions
 
 ## Deploy via Azure DevOps
