@@ -38,7 +38,7 @@ module vnetModule '../build/vnet_nsg.bicep' = {
 }
 
 // Create Application Insights & Log Analytics Workspace
-module appInsightsModule '../build/appInsights_loganalytics.bicep' = {
+module appInsightsModule '../build/appinsights_loganalytics.bicep' = {
   name: 'appInsightsDeploy'
   scope: newRG
   params: {
