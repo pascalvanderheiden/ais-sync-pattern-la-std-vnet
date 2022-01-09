@@ -88,7 +88,7 @@ module aseModule '../build/ase_asp.bicep' = {
   params: {
     namePrefix: namePrefix
     location: location
-    virtualNetworkId: vnetModule.outputs.virtualNetworkId
+    virtualNetworkId: vnetModule.outputs.subnet3ResourceId
     subnetName: vnetModule.outputs.subnet3Name
   }
   dependsOn:[

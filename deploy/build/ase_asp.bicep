@@ -7,7 +7,6 @@ param subnetName string
 
 var aseName = '${namePrefix}-ase'
 var internalLoadBalancingMode = 'Web,Publishing'
-var dnsSuffix = '${aseName}.appserviceenvironment.net'
 var appServicePlanName = '${aseName}-la-sp'
 var numberOfWorkers = 1
 var workerPool = '1v2'
@@ -21,10 +20,8 @@ resource hostingEnvironment 'Microsoft.Web/hostingEnvironments@2020-06-01' = {
     location: location
     ipsslAddressCount: 0
     internalLoadBalancingMode: internalLoadBalancingMode
-    dnsSuffix: dnsSuffix
     virtualNetwork: {
       id: virtualNetworkId
-      subnet: subnetName
     }
     workerPools: []
   }
