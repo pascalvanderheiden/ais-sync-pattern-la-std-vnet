@@ -22,6 +22,7 @@ resource hostingEnvironment 'Microsoft.Web/hostingEnvironments@2020-06-01' = {
     internalLoadBalancingMode: internalLoadBalancingMode
     virtualNetwork: {
       id: virtualNetworkId
+      subnet: subnetName
     }
     workerPools: []
   }

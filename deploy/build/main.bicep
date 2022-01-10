@@ -108,7 +108,7 @@ module logicAppModule '../build/logicapp.bicep' = {
     aseDomainName: aseModule.outputs.aseDomainName
     appInsightsInstrKey: appInsightsModule.outputs.appInsightsInstrKey
     appInsightsEndpoint: appInsightsModule.outputs.appInsightsEndpoint
-    storageEndpoint: stgModule.outputs.storageEndpoint
+    storageConnectionString: stgModule.outputs.storageConnectionString
   }
   dependsOn:[
     aseModule

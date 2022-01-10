@@ -30,3 +30,5 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
 
 output storageName string = stg.name
 output storageEndpoint string = stg.properties.primaryEndpoints.blob
+var blobStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${stg.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(stg.id, stg.apiVersion).keys[0].value}'
+output storageConnectionString string = blobStorageConnectionString

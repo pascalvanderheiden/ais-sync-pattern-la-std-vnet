@@ -129,6 +129,14 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           networkSecurityGroup: nsgSubnet3.id == '' ? null : {
             id: nsgSubnet3.id
           }
+          delegations: [
+            {
+                name: 'Microsoft.Web.hostingEnvironments'
+                properties: {
+                    serviceName: 'Microsoft.Web/hostingEnvironments'
+                }
+            }
+          ]
         }
       }
     ]

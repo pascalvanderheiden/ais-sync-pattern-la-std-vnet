@@ -7,7 +7,7 @@ param aseExtId string
 param aseDomainName string
 param appInsightsInstrKey string
 param appInsightsEndpoint string
-param storageEndpoint string
+param storageConnectionString string
 
 var logicAppName = '${namePrefix}-la'
 var logicAppEnabledState = true
@@ -38,7 +38,12 @@ resource la 'Microsoft.Web/sites@2021-02-01' = {
       id: aseExtId
     }
     siteConfig: {
+      alwaysOn: true
       appSettings: [
+        {
+          'name': 'APP_KIND'
+          'value': 'workflowApp'
+        }
         {
           'name': 'APPINSIGHTS_INSTRUMENTATIONKEY'
           'value': appInsightsInstrKey
@@ -48,8 +53,33 @@ resource la 'Microsoft.Web/sites@2021-02-01' = {
           'value': appInsightsEndpoint
         }
         {
+          'name': 'AzureFunctionsJobHost__extensionBundle__id'
+          'value': 'Microsoft.Azure.Functions.ExtensionBundle.Workflows'
+        }
+        {
+          'name': 'AzureFunctionsJobHost__extensionBundle__version'
+          'value': '[1.*, 2.0.0)'
+        }
+        {
           'name': 'AzureWebJobsStorage'
-          'value': storageEndpoint
+          'value': storageConnectionString
+
+        }
+        {
+          'name': 'FUNCTIONS_EXTENSION_VERSION'
+          'value': '~3'
+        }
+        {
+          'name': 'FUNCTIONS_WORKER_RUNTIME'
+          'value': 'node'
+        }
+        {
+          'name': 'WEBSITE_NODE_DEFAULT_VERSION'
+          'value': '~12'
+        }
+        {
+          'name': 'WEBSITE_VNET_ROUTE_ALL'
+          'value': '1'
         }
       ]
     }
