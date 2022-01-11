@@ -12,6 +12,9 @@ In my journey I ran into some networking related issue's. When you are deploying
 
 For deployment I choose to do it all in Bicep templates. I haven't done a lot with Bicep yet, so it's about time I do. I got most of my examples from [here](https://github.com/Azure/bicep/tree/main/docs/examples).
 
+For deploying the Logic App (Standard) via [Github Actions](https://github.com/Azure/logicapps/tree/master/github-sample).
+For deploying the Logic App (Standard) via [Azure DevOps](https://github.com/Azure/logicapps/tree/master/azure-devops-sample).
+
 ## Architecture
 
 ![ais-dapr-apim](docs/images/arch.png)
@@ -52,6 +55,13 @@ choco install bicep
 Install-Module -Name Az -AllowClobber -Scope CurrentUser
 ```
 
+* Install Logic App Azure Cli extensions
+
+```ps1
+az extension add --name logic
+az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any.whl"
+```
+
 ## Deploy Manually
 
 * Git Clone the repository
@@ -77,6 +87,31 @@ New-AzSubscriptionDeployment -name "<deployment_name>" -namePrefix "<project_pre
 
 ```ps1
 Get-AzSubscriptionDeployment -Name "<deployment_name>"
+```
+
+* Create and deploy your local developed Logic App to Azure
+Now everything is setup & ready to create your first workflow. In order to follow an agile development process I use [Visual Studio Code to create my Logic Apps (Standard)](https://docs.microsoft.com/en-us/azure/logic-apps/create-single-tenant-workflows-visual-studio-code) and I use Github to sync, share, deploy & collaborate my code.
+I've already prepared a simpel request and response workflow in this repository. Which we can deploy via Visual Studio Code or the Az Cli. 
+
+![ais-dapr-apim](docs/images/logic-app-designer.png)
+
+Because I prepared this solution already for a DevOps approach, I will use the CLI.
+
+First we need to Zip the Logic App project files (in this project I don't have any connections.json, so you can leave that one out)
+
+```ps1
+$compress = @{
+  Path = ".\<workflow_folder>", ".\connections.json", ".\host.json"
+  CompressionLevel = "Fastest"
+  DestinationPath = ".\deploy\release\<name of workflow>-deploy.zip"
+}
+Compress-Archive @compress
+```
+
+Now we can deploy it to Azure.
+
+```ps1
+az logicapp deployment source config-zip --name "<logicapp_name>" --resource-group "<resource_group>" --subscription "<subscription_id>" --src "\deploy\release\<name of workflow>-deploy.zip"
 ```
 
 ## Deploy via Github Actions
