@@ -12,7 +12,7 @@ param storageConnectionString string
 var logicAppName = '${namePrefix}-la'
 var logicAppEnabledState = true
 
-resource la 'Microsoft.Web/sites@2021-02-01' = {
+resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
   name: logicAppName
   location: location
   kind: 'functionapp,workflowapp'
@@ -86,4 +86,4 @@ resource la 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
-output LogicAppName string = la.name
+output LogicAppName string = logicApp.name

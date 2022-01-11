@@ -77,7 +77,7 @@ Connect-AzAccount
 Set-AzContext -Subscription "xxxx-xxxx-xxxx-xxxx"
 ```
 
-* Deploy Azure services (refer to the location of the master.bicep file)
+* Deploy Azure services (refer to the location of the main.bicep file)
 
 ```ps1
 New-AzSubscriptionDeployment -name "<deployment_name>" -namePrefix "<project_prefix>" -Location "West Europe" -TemplateFile "<path-to-bicep>" -AsJob
@@ -108,10 +108,16 @@ $compress = @{
 Compress-Archive @compress
 ```
 
-Now we can deploy it to Azure.
+Now we can deploy the Logic App to Azure.
 
 ```ps1
 az logicapp deployment source config-zip --name "<logicapp_name>" --resource-group "<resource_group>" --subscription "<subscription_id>" --src "\deploy\release\<name of workflow>-deploy.zip"
+```
+
+* Deploy the API to API Management (refer to the location of the apim-ais-sync-get-wf-deploy.bicep file)
+
+```ps1
+New-AzResourceGroupDeployment -Name "<deployment_name>" -ResourceGroupName "<resource_group>" -TemplateFile "<path-to-bicep>" -AsJob
 ```
 
 ## Deploy via Github Actions

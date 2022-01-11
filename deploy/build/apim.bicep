@@ -54,4 +54,12 @@ resource apiManagementLogger 'Microsoft.ApiManagement/service/loggers@2020-12-01
   }
 }
 
+resource apimPolicy 'Microsoft.ApiManagement/service/policies@2019-12-01' = {
+  name: '${apiManagement.name}/policy'
+  properties:{
+    format: 'rawxml'
+    value: '<policies><inbound /><backend><forward-request /></backend><outbound /><on-error /></policies>'
+  }
+}
+
 output apimName string = apiManagement.name
