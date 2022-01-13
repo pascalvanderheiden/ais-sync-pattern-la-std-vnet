@@ -62,7 +62,7 @@ az extension add --name logic
 az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any.whl"
 ```
 
-## Deploy Manually
+## Deploy Manually step by step
 
 * Git Clone the repository
 
@@ -70,23 +70,50 @@ az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any
 git clone https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet.git
 ```
 
+* Defining some variables we need
+
+```ps1
+$subscriptionId = "xxxx-xxxx-xxxx-xxxx"
+$deploymentNameBuild = "<deployment_name_build>"
+$deploymentNameRelease = "<deployment_name_release>"
+$namePrefix = "<project_prefix>"
+$location = "West Europe"
+$resourceGroup = "$namePrefix-rg"
+$apiName = "<api_name>"
+$apiPath = "<api_path>"
+$buildBicepPath = ".\deploy\build\main.bicep"
+$releaseBicepPath = ".\deploy\release\$workflowName-deploy-api.bicep"
+$logicAppName = "<logicapp_name>"
+$workflowName = "<workflow_name>"
+$workflowPath = ".\$workflowName"
+$destinationPath = ".\deploy\release\$workflowName-deploy.zip"
+$apimNameValueSig = "$workflowName-sig"
+```
+
 * Connect with Azure and set the Subscription to deploy resources to.
 
 ```ps1
 Connect-AzAccount
-Set-AzContext -Subscription "xxxx-xxxx-xxxx-xxxx"
+Set-AzContext -Subscription $subscriptionId
 ```
 
 * Deploy Azure services (refer to the location of the main.bicep file)
 
 ```ps1
-New-AzSubscriptionDeployment -name "<deployment_name>" -namePrefix "<project_prefix>" -Location "West Europe" -TemplateFile "<path-to-bicep>" -AsJob
+New-AzSubscriptionDeployment -name $deploymentNameBuild -namePrefix $namePrefix -Location $location -TemplateFile $buildBicepPath -AsJob
 ```
 
 * Check on the status of the deployment
 
 ```ps1
-Get-AzSubscriptionDeployment -Name "<deployment_name>"
+Get-AzSubscriptionDeployment -Name $deploymentNameBuild
+```
+
+* Retrieve API Management Name (generated in script)
+
+```ps1
+$apimName = az apim list --resource-group $resourceGroup --subscription $subscriptionId --query "[].{Name:name}" -o tsv
+Write-Host $apimName
 ```
 
 * Create and deploy your local developed Logic App to Azure
@@ -101,9 +128,9 @@ First we need to Zip the Logic App project files (in this project I don't have a
 
 ```ps1
 $compress = @{
-  Path = ".\<workflow_folder>", ".\connections.json", ".\host.json"
+  Path = $workflowPath, ".\connections.json", ".\host.json"
   CompressionLevel = "Fastest"
-  DestinationPath = ".\deploy\release\<name of workflow>-deploy.zip"
+  DestinationPath = $destinationPath
 }
 Compress-Archive @compress
 ```
@@ -111,14 +138,23 @@ Compress-Archive @compress
 Now we can deploy the Logic App to Azure.
 
 ```ps1
-az logicapp deployment source config-zip --name "<logicapp_name>" --resource-group "<resource_group>" --subscription "<subscription_id>" --src "\deploy\release\<name of workflow>-deploy.zip"
+az logicapp deployment source config-zip --name $logicAppName --resource-group $resourceGroup --subscription $subscriptionId --src $destinationPath
+```
+
+We need to store the SAS signature, so we can use this in the API definition in API Management. I've created a PowerShell script to retrieve the signature, and place it into a Named Value in API Management.
+
+```ps1
+.\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId $subscriptionId -resourceGroup $resourceGroup -logicAppName $logicAppName -workflowName $workflowName -apimName $apimName -apimNamedValueSig $apimNameValueSig
 ```
 
 * Deploy the API to API Management (refer to the location of the apim-ais-sync-get-wf-deploy.bicep file)
 
 ```ps1
-New-AzResourceGroupDeployment -Name "<deployment_name>" -ResourceGroupName "<resource_group>" -TemplateFile "<path-to-bicep>" -AsJob
+New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -apiName $apiName -apiPath $apiName -TemplateFile $releaseBicepPath -AsJob
 ```
+
+* Testing
+I've included a tests.http file with relevant Test you can perform, to check if your deployment is successful.
 
 ## Deploy via Github Actions
 
