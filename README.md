@@ -81,10 +81,10 @@ $location = "West Europe"
 $resourceGroup = "$namePrefix-rg"
 $apiName = "<api_name>"
 $apiPath = "<api_path>"
+$workflowName = "<workflow_name>"
 $buildBicepPath = ".\deploy\build\main.bicep"
 $releaseBicepPath = ".\deploy\release\$workflowName-deploy-api.bicep"
-$logicAppName = "<logicapp_name>"
-$workflowName = "<workflow_name>"
+$logicAppName = "$namePrefix-la"
 $workflowPath = ".\$workflowName"
 $destinationPath = ".\deploy\release\$workflowName-deploy.zip"
 $apimNameValueSig = "$workflowName-sig"
@@ -150,7 +150,14 @@ We need to store the SAS signature, so we can use this in the API definition in 
 * Deploy the API to API Management (refer to the location of the apim-ais-sync-get-wf-deploy.bicep file)
 
 ```ps1
-New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -apiName $apiName -apiPath $apiName -TemplateFile $releaseBicepPath -AsJob
+New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -apiName $apiName -apiPath $apiPath -TemplateFile $releaseBicepPath -AsJob
+```
+
+* Just do it by script
+If you don't want to execute each single step; I've included all the steps in 1 Powershell script:
+
+```ps1
+.\deploy\manual-deploy.ps1 -subscriptionId "xxxx-xxxx-xxxx-xxxx" -deploymentNameBuild "<deployment_name_build>" -deploymentNameRelease "<deployment_name_release>" -namePrefix "<project_prefix>" -workflowName "<workflow_name>" -apiName "<api_name>" -apiPath "<api_path>"
 ```
 
 * Testing
