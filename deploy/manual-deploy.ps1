@@ -1,5 +1,7 @@
 param ($subscriptionId, $deploymentNameBuild, $deploymentNameRelease, $namePrefix, $workflowName, $apiName, $apiPath)
 
+invoke-restmethod -uri "https://artii.herokuapp.com/make?text=Azure-Deploy&font=speed" -DisableKeepAlive
+
 Write-Host "Setting the paramaters:"
 $location = "West Europe"
 $resourceGroup = "$namePrefix-rg"
@@ -22,7 +24,6 @@ Write-Host "Workflow directory: "$workflowPath
 Write-Host "Output Path Workflow deployment: "$destinationPath
 Write-Host "API Name: "$apiName
 Write-Host "API Path: "$apiPath
-
 
 Write-Host "Login to Azure:"
 Connect-AzAccount
