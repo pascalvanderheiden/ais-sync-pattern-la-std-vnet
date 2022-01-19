@@ -13,6 +13,7 @@ param namePrefix string
 ])
 param storageSKU string = 'Standard_LRS'
 param location string
+param fileShareName string
 
 var uniqueStorageName = '${namePrefix}${uniqueString(resourceGroup().id)}st01'
 
@@ -26,6 +27,10 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
   }
+}
+
+resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2021-04-01' = {
+  name: '${stg.name}/default/${fileShareName}'
 }
 
 output storageName string = stg.name

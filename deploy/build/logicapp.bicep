@@ -1,6 +1,6 @@
 @minLength(3)
 @maxLength(11)
-param namePrefix string
+param logicAppName string
 param location string
 param appServicePlanExtId string
 param aseExtId string
@@ -9,7 +9,6 @@ param appInsightsInstrKey string
 param appInsightsEndpoint string
 param storageConnectionString string
 
-var logicAppName = '${namePrefix}-la'
 var logicAppEnabledState = true
 
 resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
@@ -34,6 +33,7 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
       }
     ]
     serverFarmId: appServicePlanExtId
+    clientAffinityEnabled: true
     hostingEnvironmentProfile: {
       id: aseExtId
     }
@@ -79,6 +79,10 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           'name': 'WEBSITE_VNET_ROUTE_ALL'
+          'value': '1'
+        }
+        {
+          'name': 'WEBSITE_CONTENTOVERVNET'
           'value': '1'
         }
       ]

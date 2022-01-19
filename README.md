@@ -116,31 +116,33 @@ $apimName = az apim list --resource-group $resourceGroup --subscription $subscri
 Write-Host $apimName
 ```
 
+* Get Storage Account Name & Key for Logic App Deployment
+
+```ps1
+$storageAccountName = az storage account list -g $resourceGroup --subscription $subscriptionId --query "[].{Name:name}" -o tsv
+$storageKey = az storage account keys list -g $resourceGroup -n $storageAccountName --query "[0].{Name:value}" -o tsv
+Write-Host $storageAccountName
+```
+
 * Create and deploy your local developed Logic App to Azure
 Now everything is setup & ready to create your first workflow. In order to follow an agile development process I use [Visual Studio Code to create my Logic Apps (Standard)](https://docs.microsoft.com/en-us/azure/logic-apps/create-single-tenant-workflows-visual-studio-code) and I use Github to sync, share, deploy & collaborate my code.
-I've already prepared a simpel request and response workflow in this repository. Which we can deploy via Visual Studio Code or the Az Cli. 
 
-![ais-dapr-apim](docs/images/logic-app-designer.png)
+I've already prepared a simpel request and response workflow in this repository. Which we can deploy via Visual Studio Code or the Az Cli.
+
+![ais-syc-pattern-la-std-vnet](docs/images/logic-app-designer.png)
 
 Because I prepared this solution already for a DevOps approach, I will use the CLI.
 
-First we need to Zip the Logic App project files (in this project I don't have any connections.json, so you can leave that one out)
+Logic Apps Standard uses Azure Storage for storing the workflows. So, we only need to copy these files to the File Share in my Storage Account. My Storage Account is public in my case, but you can also make this private as well, and use Service Endpoints to create a isolated connection between Logic Apps and Azure Storage.
 
 ```ps1
-$compress = @{
-  Path = $workflowPath, ".\connections.json", ".\host.json"
-  CompressionLevel = "Fastest"
-  DestinationPath = $destinationPath
-}
-Compress-Archive @compress
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/host.json" --source ".\host.json"
+#az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/connections.json" --source ".\connections.json"
+az storage directory create --account-name $storageAccountName --account-key $storageKey --name "site/wwwroot/$workflowName" --share-name $logicAppName
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/$workflowName/workflow.json" --source ".\$workflowName\workflow.json"
 ```
 
-Now we can deploy the Logic App to Azure.
-
-```ps1
-az logicapp deployment source config-zip --name $logicAppName --resource-group $resourceGroup --subscription $subscriptionId --src $destinationPath
-```
-
+* Store the SAS signature in a Named Value in API Management
 We need to store the SAS signature, so we can use this in the API definition in API Management. I've created a PowerShell script to retrieve the signature, and place it into a Named Value in API Management.
 
 ```ps1

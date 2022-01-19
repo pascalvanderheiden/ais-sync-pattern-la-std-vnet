@@ -10,6 +10,7 @@ param location string = deployment().location
 
 // set local var
 var resourceGroupName = '${namePrefix}-rg'
+var logicAppName = '${namePrefix}-la'
 
 // Create a Resource Group
 resource newRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -24,6 +25,7 @@ module stgModule '../build/storage.bicep' = {
   params: {
     namePrefix: namePrefix
     location: location
+    fileShareName: logicAppName
   }
 }
 
@@ -101,7 +103,7 @@ module logicAppModule '../build/logicapp.bicep' = {
   name: 'logicAppDeploy'
   scope: newRG
   params: {
-    namePrefix: namePrefix
+    logicAppName: logicAppName
     location: location
     appServicePlanExtId: aseModule.outputs.appServicePlanExtId
     aseExtId: aseModule.outputs.aseExtId

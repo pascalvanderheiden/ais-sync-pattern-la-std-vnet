@@ -7,6 +7,4 @@ $workflowDetails = az rest --method post --uri https://management.azure.com/subs
 $json = $workflowDetails | ConvertFrom-Json
 $sig = ($json.queries | where sig).sig
 
-az apim nv create --service-name $apimName -g $resourceGroup --named-value-id $apimNamedValueSig --display-name $apimNamedValueSig --value $sig
-
-Write-Host $sig
+az apim nv create --service-name $apimName -g $resourceGroup --named-value-id $apimNamedValueSig --display-name $apimNamedValueSig --value $sig --secret true

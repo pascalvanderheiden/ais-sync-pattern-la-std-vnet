@@ -36,20 +36,19 @@ Write-Host "Retrieve API Management Instance Name:"
 $apimName = az apim list --resource-group $resourceGroup --subscription $subscriptionId --query "[].{Name:name}" -o tsv
 Write-Host $apimName
 
-Write-Host "Package workflow:"
-$compress = @{
-    Path = $workflowPath, ".\connections.json", ".\host.json"
-    CompressionLevel = "Fastest"
-    DestinationPath = $destinationPath
-}
-Compress-Archive @compress
+Write-Host "Retrieve Storage Account Name & Key Name:"
+$storageAccountName = az storage account list -g $resourceGroup --subscription $subscriptionId --query "[].{Name:name}" -o tsv
+$storageKey = az storage account keys list -g $resourceGroup -n $storageAccountName --query "[0].{Name:value}" -o tsv
+Write-Host $storageAccountName
 
-# werk niet.
 Write-Host "Release Workflow to Logic App:"
-az logicapp deployment source config-zip --name $logicAppName --resource-group $resourceGroup --subscription $subscriptionId --src $destinationPath
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/host.json" --source ".\host.json"
+#az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/connections.json" --source ".\connections.json"
+az storage directory create --account-name $storageAccountName --account-key $storageKey --name "site/wwwroot/$workflowName" --share-name $logicAppName
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/$workflowName/workflow.json" --source ".\$workflowName\workflow.json"
 
 Write-Host "Retrieve SAS Key and store in API Management as Named Value:"
 .\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId $subscriptionId -resourceGroup $resourceGroup -logicAppName $logicAppName -workflowName $workflowName -apimName $apimName -apimNamedValueSig $apimNameValueSig
 
 Write-Host "Release API definition to API Management:"
-New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -apiName $apiName -apiPath $apiPath -TemplateFile $releaseBicepPath -AsJob
+New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -apiName $apiName -apiPath $apiPath -TemplateFile $releaseBicepPath
