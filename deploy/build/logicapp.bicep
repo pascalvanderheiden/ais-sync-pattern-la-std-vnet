@@ -63,7 +63,6 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           'name': 'AzureWebJobsStorage'
           'value': storageConnectionString
-
         }
         {
           'name': 'FUNCTIONS_EXTENSION_VERSION'
@@ -74,8 +73,8 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
           'value': 'node'
         }
         {
-          'name': 'WEBSITE_NODE_DEFAULT_VERSION'
-          'value': '~12'
+          'name': 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          'value': storageConnectionString
         }
         {
           'name': 'WEBSITE_VNET_ROUTE_ALL'
@@ -85,7 +84,26 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
           'name': 'WEBSITE_CONTENTOVERVNET'
           'value': '1'
         }
+        {
+          'name': 'WEBSITE_CONTENTSHARE'
+          'value': logicAppName
+        }
+        {
+          'name': 'WEBSITE_DNS_SERVER'
+          'value': '168.63.129.16'
+        }
       ]
+      cors: {
+        allowedOrigins: [
+            'https://afd.hosting.portal.azure.net'
+            'https://afd.hosting-ms.portal.azure.net'
+            'https://hosting.portal.azure.net'
+            'https://ms.hosting.portal.azure.net'
+            'https://ema-ms.hosting.portal.azure.net'
+            'https://ema.hosting.portal.azure.net'
+            'https://ema.hosting.portal.azure.net'
+        ]
+      }
     }
   }
 }
