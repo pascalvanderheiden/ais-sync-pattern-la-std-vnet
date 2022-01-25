@@ -25,7 +25,7 @@ module stgModule '../build/storage.bicep' = {
   params: {
     namePrefix: namePrefix
     location: location
-    fileShareName: logicAppName
+//    fileShareName: logicAppName
   }
 }
 

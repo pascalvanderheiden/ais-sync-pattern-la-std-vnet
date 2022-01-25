@@ -17,13 +17,12 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' existing = {
 }
 
 resource apimApi 'Microsoft.ApiManagement/service/apis@2020-12-01' = {
-  name: apiName
+  name: toLower(apiName)
   parent: apiManagement
   properties: {
     path: apiPath
     apiRevision: '1'
     displayName: apiName
-    description: apiName
     subscriptionRequired: false
     protocols: [
       'https'
