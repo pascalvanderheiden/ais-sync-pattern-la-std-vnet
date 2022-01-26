@@ -41,19 +41,19 @@ $storageAccountName = az storage account list -g $resourceGroup --subscription $
 $storageKey = az storage account keys list -g $resourceGroup -n $storageAccountName --query "[0].{Name:value}" -o tsv
 Write-Host $storageAccountName
 
-Write-Host "Release Workflow to Logic App:"
-$compress = @{
-    Path = $workflowPath, ".\host.json"
-    CompressionLevel = "Fastest"
-    DestinationPath = $destinationPath
-}
-Compress-Archive @compress
+#Write-Host "Release Workflow to Logic App:"
+#$compress = @{
+#    Path = $workflowPath, ".\host.json"
+#    CompressionLevel = "Fastest"
+#    DestinationPath = $destinationPath
+#}
+#Compress-Archive @compress
 
-az logicapp deployment source config-zip --name $logicAppName --resourcegroup $resourceGroup --subscription $subscriptionId --src $destinationPath
-#az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/host.json" --source ".\host.json"
-#az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/connections.json" --source ".\connections.json"
-#az storage directory create --account-name $storageAccountName --account-key $storageKey --name "site/wwwroot/$workflowName" --share-name $logicAppName
-#az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/$workflowName/workflow.json" --source ".\$workflowName\workflow.json"
+#az logicapp deployment source config-zip --name $logicAppName --resourcegroup $resourceGroup --subscription $subscriptionId --src $destinationPath
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/host.json" --source ".\host.json"
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/connections.json" --source ".\connections.json"
+az storage directory create --account-name $storageAccountName --account-key $storageKey --name "site/wwwroot/$workflowName" --share-name $logicAppName
+az storage file upload --account-name $storageAccountName --account-key $storageKey --share-name $logicAppName --path "site/wwwroot/$workflowName/workflow.json" --source ".\$workflowName\workflow.json"
 
 Write-Host "Retrieve SAS Key and store in API Management as Named Value:"
 .\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId $subscriptionId -resourceGroup $resourceGroup -logicAppName $logicAppName -workflowName $workflowName -apimName $apimName -apimNamedValueSig $apimNameValueSig
