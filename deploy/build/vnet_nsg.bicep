@@ -93,7 +93,34 @@ resource nsgSubnet3 'Microsoft.Network/networkSecurityGroups@2020-07-01' = {
   location: location
   tags: {}
   properties: {
-    securityRules: []
+    securityRules: [
+      {
+          name: 'AllowVnetAzureConOutbound'
+          properties: {
+              protocol: '*'
+              sourcePortRange: '*'
+              destinationPortRange: '*'
+              sourceAddressPrefix: 'VirtualNetwork'
+              destinationAddressPrefix: 'AzureConnectors.WestEurope'
+              access: 'Allow'
+              priority: 2700
+              direction: 'Outbound'
+          }
+      }
+      {
+          name: 'AllowVnetAzureConInbound'
+          properties: {
+              protocol: '*'
+              sourcePortRange: '*'
+              destinationPortRange: '*'
+              sourceAddressPrefix: 'AzureConnectors.WestEurope'
+              destinationAddressPrefix: 'VirtualNetwork'
+              access: 'Allow'
+              priority: 2710
+              direction: 'Inbound'
+          }
+      }
+    ]
   }
 }
 

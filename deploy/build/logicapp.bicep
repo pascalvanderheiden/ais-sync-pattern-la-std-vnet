@@ -77,6 +77,10 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
           'name': 'WEBSITE_NODE_DEFAULT_VERSION'
           'value': '~12'
         }
+        {
+          'name': 'WEBSITE_DNS_SERVER'
+          'value': '168.63.129.16'
+        }
         */
         {
           'name': 'WEBSITE_VNET_ROUTE_ALL'
@@ -93,10 +97,6 @@ resource logicApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           'name': 'WEBSITE_CONTENTSHARE'
           'value': logicAppName
-        }
-        {
-          'name': 'WEBSITE_DNS_SERVER'
-          'value': '168.63.129.16'
         }
       ]
       cors: {

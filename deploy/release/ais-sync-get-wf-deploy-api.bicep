@@ -1,6 +1,7 @@
 targetScope = 'resourceGroup'
 
 param apimName string
+param appInsightsName string
 param logicAppName string
 param workflowName string
 param workflowSigNamedValue string
@@ -10,6 +11,10 @@ var apiPolicy = '<policies><inbound><base /><set-header name="Ocp-Apim-Subscript
 
 resource apiManagement 'Microsoft.ApiManagement/service@2020-12-01' existing = {
   name: apimName
+}
+
+resource apiManagementLogger 'Microsoft.ApiManagement/service/loggers@2020-12-01' existing = {
+  name: '${apimName}/${appInsightsName}'
 }
 
 resource logicApp 'Microsoft.Web/sites@2021-02-01' existing = {
@@ -76,4 +81,17 @@ resource apiGetPolicies 'Microsoft.ApiManagement/service/apis/operations/policie
   dependsOn: [
     logicAppBackend
   ]
+}
+
+resource apiMonitoring 'Microsoft.ApiManagement/service/apis/diagnostics@2020-06-01-preview' = {
+  name: 'applicationinsights'
+  parent: apimApi
+  properties: {
+    alwaysLog: 'allErrors'
+    loggerId: apiManagementLogger.id  
+    logClientIp: true
+    httpCorrelationProtocol: 'W3C'
+    verbosity: 'verbose'
+    operationNameFormat: 'Url'
+  }
 }

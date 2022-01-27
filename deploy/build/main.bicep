@@ -98,6 +98,21 @@ module aseModule '../build/ase_asp.bicep' = {
   ]
 }
 
+// Create Private DNS Zone
+module privDnsModule '../build/dns.bicep' = {
+  name: 'privDNSDeploy'
+  scope: newRG
+  params: {
+    aseDomainName: aseModule.outputs.aseDomainName
+    virtualNetworkId: vnetModule.outputs.virtualNetworkId
+    aseIp: '10.0.2.4' //fixed, first assignment within vnet delegated to ASEv3
+  }
+  dependsOn:[
+    aseModule
+    vnetModule
+  ]
+}
+
 // Create Logic Apps (Standard)
 module logicAppModule '../build/logicapp.bicep' = {
   name: 'logicAppDeploy'
@@ -116,5 +131,6 @@ module logicAppModule '../build/logicapp.bicep' = {
     aseModule
     stgModule
     appInsightsModule
+    privDnsModule
   ]
 }
