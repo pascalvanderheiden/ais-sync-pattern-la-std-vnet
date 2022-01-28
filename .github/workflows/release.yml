@@ -1,0 +1,101 @@
+name: Release
+
+env:
+  # deploymentNameBuild: ${{ github.event.inputs.deploymentNameBuild }}
+  # location: ${{ github.event.inputs.location }}
+  resourceGroup: '${{ secrets.PREFIX }}-rg'
+  releaseBicepPath: './deploy/release/${{ secrets.WORKFLOW_NAME }}-deploy-api.bicep'
+  logicAppName: '${{ secrets.PREFIX }}-la'
+  appInsightsName: '${{ secrets.PREFIX }}-ai'
+  workflowPath: './${{ secrets.WORKFLOW_NAME }}'
+  apimNameValueSig: '${{ secrets.WORKFLOW_NAME }}-sig'
+
+on:
+  # Only trigger, when the build workflow succeeded
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
+  # Allows you to run this workflow manually from the Actions tab
+  # workflow_dispatch:
+  #   inputs:
+  #     deploymentNameBuild:
+  #       description: 'Deployment Name Build'     
+  #       required: true
+  #     location:
+  #       description: 'Location for deployment'     
+  #       required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # LOGIN TO AZURE. THE LOGGED IN SESSION IS ACTIVE TILL A LOGOUT ACTION IS CALLED (OR THE JOB FINISHED)
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true 
+
+      # SET CORRECT AZURE CONTEXT
+      - name: 'Set context to subscription'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Set-AzContext -Subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azPSVersion: "latest"
+
+      # GET APIM INSTANCE NAME
+      - name: 'Retrieve API Management Instance Name'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            $apimName = az apim list --resource-group '${{ env.resourceGroup }}' --subscription '${{ secrets.AZURE_SUBSCRIPTION_ID }}' --query '[].{Name:name}' -o tsv
+            echo 'API Management Instance: ${apimName}'
+            echo "APIM_NAME=${apimName}" >> $Env:GITHUB_ENV
+          azPSVersion: "latest"
+
+      # GET STORAGE ACCOUNT NAME AND KEY
+      - name: 'Retrieve Storage Account Name & Key Name'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            $storageAccountName = az storage account list -g '${{ env.resourceGroup }}' --subscription '${{ secrets.AZURE_SUBSCRIPTION_ID }}' --query '[].{Name:name}' -o tsv
+            $storageKey = az storage account keys list -g '${{ env.resourceGroup }}' -n $storageAccountName --query '[0].{Name:value}' -o tsv
+            echo "SA_NAME=${storageAccountName}" >> $Env:GITHUB_ENV
+            echo "SA_KEY=${{storageKey}" >> $Env:GITHUB_ENV
+          azPSVersion: "latest"
+
+      # DEPLOY WORKFLOW TO LOGIC APP
+      - name: 'Retrieve Storage Account Name & Key Name'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}'--share-name '${{ env.logicAppName }}' --path 'site/wwwroot/host.json' --source '.\host.json'
+            az storage directory create --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --name 'site/wwwroot/${{ secret.WORKFLOW_NAME }}' --share-name '${{ env.logicAppName }}'
+            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --share-name '${{ env.logicAppName }}' --path 'site/wwwroot/${{ secret.WORKFLOW_NAME }}/workflow.json" --source ".\$workflowName\workflow.json"
+          azPSVersion: "latest"
+
+      # RETRIEVE SAS KEY LOGIC APP WORKFLOW AND STORE IT IN APIM NAMED VALUE
+      - name: 'Retrieve SAS Key and store in API Management as Named Value'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            .\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId '${{ secrets.AZURE_SUBSCRIPTION_ID }}' -resourceGroup '${{ env.resourceGroup }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secret.WORKFLOW_NAME }}' -apimName '${{ env.APIM_NAME }}' -apimNamedValueSig '${{ env.apimNameValueSig }}'
+          azPSVersion: "latest"
+
+      # DEPLOY API TO API MANAGEMENT
+      - name: 'Release API definition to API Management'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            New-AzResourceGroupDeployment -Name '${{ secrets.DEPLOYMENT_NAME_RELEASE }}' -ResourceGroupName '${{ env.resourceGroup }}' -apimName '${{ env.APIM_NAME }}' -appInsightsName '${{ env.appInsightsName }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secret.WORKFLOW_NAME }}' -workflowSigNamedValue '${{ env.apimNameValueSig }}' -apiName '${{ secret.API_NAME }}' -apiPath '${{ secret.API_PATH }}' -TemplateFile '${{ env.releaseBicepPath }}'
+          azPSVersion: "latest"
+
+      # LOGOUT
+      - name: logout
+        run: |
+          az logout

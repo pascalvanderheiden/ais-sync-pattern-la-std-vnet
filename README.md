@@ -1,5 +1,14 @@
 # ais-sync-pattern-la-std-vnet
 
+## Build Status
+
+| GitHub Action Pipeline | Status |
+| ----------- | ----------- |
+| Build       | [![Build](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/build.yml) |
+| Release     |         |
+
+## About
+
 Deploy a Logic App synchronous pattern VNET isolated in a App Service Environment exposed via Front Door and API Management. This deployment can be done by Github Actions or manually.
 
 To setup API Management with Azure Front Door, I used this [deployment script](https://github.com/Azure/azure-quickstart-templates/tree/master/quickstarts/microsoft.network/front-door-api-management).
@@ -108,7 +117,7 @@ If you deleted the deployment via the Azure Portal, and you want to run this dep
 * Testing
 I've included a tests.http file with relevant Test you can perform, to check if your deployment is successful.
 
-## Deploy via Github Actions
+## Deploy with Github Actions
 
 * Generate a Service Principal
 
@@ -120,7 +129,17 @@ Copy the json output of this command.
 
 * Update GitHub Secrets for customizing your deployment
 In the repository go to 'Settings', on the left 'Secrets', 'Actions'.
-And past the json output in the command used above into the secret 'AZURE_CREDENTIALS'.
-Also update the secret 'AZURE_SUBSCRIPTION_ID' with the subscription id from Azure, 'LOCATION' with a valid Azure Region, like 'West Europe' and 'DEPLOYMENT_NAME_BUILD' with a name for your deployment. For naming convention on this deployement, you only need to fill 'PREFIX' with a suitable prefix, so al resources that are created have a readable reference in the name.
+And pass the json output in the command used above into the secret 'AZURE_CREDENTIALS'.
+
+The following secrets need to be created:
+
+-AZURE_SUBSCRIPTION_ID
+-LOCATION
+-DEPLOYMENT_NAME_BUILD
+-DEPLOYMENT_NAME_RELEASE
+-PREFIX
+-API_NAME
+-API_PATH
+-WORKFLOW_NAME
 
 * Commit, and it will trigger your workflow.
