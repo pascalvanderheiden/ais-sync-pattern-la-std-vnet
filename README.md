@@ -118,12 +118,9 @@ az ad sp create-for-rbac -n <name_sp>
 
 Copy the json output of this command.
 
-* Update GitHub Secrets for actions
+* Update GitHub Secrets for customizing your deployment
 In the repository go to 'Settings', on the left 'Secrets', 'Actions'.
 And past the json output in the command used above into the secret 'AZURE_CREDENTIALS'.
-Also update the secret 'AZURE_SUBSCRIPTION_ID' with the subscription id from Azure, 'LOCATION' with a valid Azure Region, like 'West Europe' and 'DEPLOYMENT_NAME_BUILD' with a name for your deployment.  
-
-* Edit the parameters for deployment
-In the ./deploy/build/main.parameters.json file you'll find the parameters required for this deployment. I've based almost everything on a name prefix, so you only need to change that one. 
+Also update the secret 'AZURE_SUBSCRIPTION_ID' with the subscription id from Azure, 'LOCATION' with a valid Azure Region, like 'West Europe' and 'DEPLOYMENT_NAME_BUILD' with a name for your deployment. For naming convention on this deployement, you only need to fill 'PREFIX' with a suitable prefix, so al resources that are created have a readable reference in the name.
 
 * Commit, and it will trigger your workflow.

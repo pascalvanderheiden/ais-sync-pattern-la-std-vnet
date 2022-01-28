@@ -29,6 +29,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      # Import Az Module
+      - name: Import Az Module
+        shell: pwsd
+        run: Import-Module Az
+
       # LOGIN TO AZURE. THE LOGGED IN SESSION IS ACTIVE TILL A LOGOUT ACTION IS CALLED (OR THE JOB FINISHED)
       - uses: azure/login@v1
         with:
