@@ -29,26 +29,28 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Import Az Module
-      - name: Import Az Module
-        shell: pwsd
-        run: Import-Module Az
-
       # LOGIN TO AZURE. THE LOGGED IN SESSION IS ACTIVE TILL A LOGOUT ACTION IS CALLED (OR THE JOB FINISHED)
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true 
 
       # SET CORRECT AZURE CONTEXT
       - name: 'Set context to subscription'
-        shell: pwsh
-        run: Set-AzContext -Subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Set-AzContext -Subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azPSVersion: "latest"
 
       # DEPLOY THE SERVICES
       - name: 'Create / Update Azure resources'
-        shell: pwsh
-        run: New-AzSubscriptionDeployment -name ${{ secrets.DEPLOYMENT_NAME_BUILD }} -namePrefix ${{ secrets.PREFIX }} -location ${{ secrets.LOCATION }} -TemplateFile ${{ env.buildBicepPath }}
-      
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            New-AzSubscriptionDeployment -name ${{ secrets.DEPLOYMENT_NAME_BUILD }} -namePrefix ${{ secrets.PREFIX }} -location ${{ secrets.LOCATION }} -TemplateFile ${{ env.buildBicepPath }}
+          azPSVersion: "latest"
+
       # LOGOUT
       - name: logout
         run: |
