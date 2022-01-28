@@ -24,6 +24,8 @@ For deployment I choose to do it all in Bicep templates. I got most of my exampl
 For deploying the Logic App (Standard) via [Github Actions](https://github.com/Azure/logicapps/tree/master/github-sample).
 For deploying the Logic App (Standard) via [Azure DevOps](https://github.com/Azure/logicapps/tree/master/azure-devops-sample).
 
+Last but not least, I used Azure Storage to deploy the workflow to my Logic App. Because you can not reach the kudo endpoint for performing a zip deployment due to the fact that the ASE is a completely isolated environment, I used a file share to deploy the workflow. I based this strategy on this [blog](https://techcommunity.microsoft.com/t5/integrations-on-azure-blog/deploying-standard-logic-app-to-storage-account-behind-firewall/ba-p/2626286)
+
 ## Architecture
 
 ![ais-dapr-apim](docs/images/arch.png)
