@@ -48,7 +48,7 @@ jobs:
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            New-AzSubscriptionDeployment -name ${{ secrets.DEPLOYMENT_NAME_BUILD }} -namePrefix ${{ secrets.PREFIX }} -location ${{ secrets.LOCATION }} -TemplateFile ${{ env.buildBicepPath }}
+            New-AzSubscriptionDeployment -name '${{ secrets.DEPLOYMENT_NAME_BUILD }}' -namePrefix '${{ secrets.PREFIX }}' -location '${{ secrets.LOCATION }}' -TemplateFile '${{ env.buildBicepPath }}'
           azPSVersion: "latest"
 
       # LOGOUT
