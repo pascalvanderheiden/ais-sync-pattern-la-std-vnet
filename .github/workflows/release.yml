@@ -65,8 +65,8 @@ jobs:
           inlineScript: |
             $storageAccountName = az storage account list -g '${{ env.resourceGroup }}' --subscription '${{ secrets.AZURE_SUBSCRIPTION_ID }}' --query '[].{Name:name}' -o tsv
             $storageKey = az storage account keys list -g '${{ env.resourceGroup }}' -n $storageAccountName --query '[0].{Name:value}' -o tsv
-            echo "SA_NAME=${storageAccountName}" >> $Env:GITHUB_ENV
-            echo "SA_KEY=${{storageKey}" >> $Env:GITHUB_ENV
+            echo "SA_NAME=$storageAccountName" >> $Env:GITHUB_ENV
+            echo "SA_KEY=$storageKey" >> $Env:GITHUB_ENV
           azPSVersion: "latest"
 
       # DEPLOY WORKFLOW TO LOGIC APP

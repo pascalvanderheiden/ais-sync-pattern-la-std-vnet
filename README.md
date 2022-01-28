@@ -2,10 +2,10 @@
 
 ## Build Status
 
-| GitHub Action Pipeline | Status |
+| GitHub Action | Status |
 | ----------- | ----------- |
-| Build       | [![Build](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/build.yml) |
-| Release     |         |
+| Build | [![Build](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/build.yml) |
+| Release | [![Release](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/release.yml/badge.svg)](https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet/actions/workflows/release.yml) |
 
 ## About
 
