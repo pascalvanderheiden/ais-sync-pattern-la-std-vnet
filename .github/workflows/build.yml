@@ -53,7 +53,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az deployment create -n ${{ secrets.DEPLOYMENT_NAME_BUILD }} --location ${{ secrets.LOCATION }} --TemplateFile ${{ env.buildJsonPath }} --parameters ${{ env.buildParamPath }}
+            az deployment create -n ${{ secrets.DEPLOYMENT_NAME_BUILD }} -l ${{ secrets.LOCATION }} -f ${{ env.buildJsonPath }} -p ${{ env.buildParamPath }}
       
       # LOGOUT
       - name: logout
