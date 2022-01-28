@@ -75,8 +75,8 @@ jobs:
         with:
           inlineScript: |
             az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}'--share-name '${{ env.logicAppName }}' --path 'site/wwwroot/host.json' --source '.\host.json'
-            az storage directory create --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --name 'site/wwwroot/${{ secret.WORKFLOW_NAME }}' --share-name '${{ env.logicAppName }}'
-            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --share-name '${{ env.logicAppName }}' --path 'site/wwwroot/${{ secret.WORKFLOW_NAME }}/workflow.json" --source ".\$workflowName\workflow.json"
+            az storage directory create --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --name 'site/wwwroot/${{ secrets.WORKFLOW_NAME }}' --share-name '${{ env.logicAppName }}'
+            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --share-name '${{ env.logicAppName }}' --path 'site/wwwroot/${{ secrets.WORKFLOW_NAME }}/workflow.json" --source ".\$workflowName\workflow.json"
           azPSVersion: "latest"
 
       # RETRIEVE SAS KEY LOGIC APP WORKFLOW AND STORE IT IN APIM NAMED VALUE
@@ -84,7 +84,7 @@ jobs:
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            .\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId '${{ secrets.AZURE_SUBSCRIPTION_ID }}' -resourceGroup '${{ env.resourceGroup }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secret.WORKFLOW_NAME }}' -apimName '${{ env.APIM_NAME }}' -apimNamedValueSig '${{ env.apimNameValueSig }}'
+            .\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId '${{ secrets.AZURE_SUBSCRIPTION_ID }}' -resourceGroup '${{ env.resourceGroup }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secrets.WORKFLOW_NAME }}' -apimName '${{ env.APIM_NAME }}' -apimNamedValueSig '${{ env.apimNameValueSig }}'
           azPSVersion: "latest"
 
       # DEPLOY API TO API MANAGEMENT
@@ -92,7 +92,7 @@ jobs:
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            New-AzResourceGroupDeployment -Name '${{ secrets.DEPLOYMENT_NAME_RELEASE }}' -ResourceGroupName '${{ env.resourceGroup }}' -apimName '${{ env.APIM_NAME }}' -appInsightsName '${{ env.appInsightsName }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secret.WORKFLOW_NAME }}' -workflowSigNamedValue '${{ env.apimNameValueSig }}' -apiName '${{ secret.API_NAME }}' -apiPath '${{ secret.API_PATH }}' -TemplateFile '${{ env.releaseBicepPath }}'
+            New-AzResourceGroupDeployment -Name '${{ secrets.DEPLOYMENT_NAME_RELEASE }}' -ResourceGroupName '${{ env.resourceGroup }}' -apimName '${{ env.APIM_NAME }}' -appInsightsName '${{ env.appInsightsName }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secrets.WORKFLOW_NAME }}' -workflowSigNamedValue '${{ env.apimNameValueSig }}' -apiName '${{ secrets.API_NAME }}' -apiPath '${{ secrets.API_PATH }}' -TemplateFile '${{ env.releaseBicepPath }}'
           azPSVersion: "latest"
 
       # LOGOUT
