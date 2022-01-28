@@ -4,8 +4,6 @@ env:
   # deploymentNameBuild: ${{ github.event.inputs.deploymentNameBuild }}
   # location: ${{ github.event.inputs.location }}
   buildBicepPath: './deploy/build/main.bicep'
-  buildJsonPath: './deploy/build/main.json' #(this file is produced after bicep file is compiled)
-  buildParamsPath: './deploy/build/main.parameters.json'
 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -38,22 +36,13 @@ jobs:
 
       # SET CORRECT AZURE CONTEXT
       - name: 'Set context to subscription'
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az account set -s '${{ secrets.AZURE_SUBSCRIPTION_ID }}'
-
-      # BUILDING BICEP OUTPUTS A JSON ARM TEMPLATE
-      - name: 'Build bicep 💪'
-        run: |
-          az bicep build --file ${{ env.buildBicepPath }}
+        shell: pwsh
+        run: Set-AzContext -Subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # DEPLOY THE SERVICES
       - name: 'Create / Update Azure resources'
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az deployment create -n ${{ secrets.DEPLOYMENT_NAME_BUILD }} -l ${{ secrets.LOCATION }} -f ${{ env.buildJsonPath }} -p ${{ env.buildParamPath }}
+        shell: pwsh
+        run: New-AzSubscriptionDeployment -name ${{ secrets.DEPLOYMENT_NAME_BUILD }} -namePrefix ${{ secrets.PREFIX }} -location ${{ secrets.LOCATION }} -TemplateFile ${{ env.buildBicepPath }}
       
       # LOGOUT
       - name: logout
