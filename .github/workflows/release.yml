@@ -73,9 +73,9 @@ jobs:
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}'--share-name '${{ env.logicAppName }}' --path 'site/wwwroot/host.json' --source '.\host.json'
+            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}'--share-name '${{ env.logicAppName }}' --path 'site/wwwroot/host.json' --source './host.json'
             az storage directory create --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --name 'site/wwwroot/${{ secrets.WORKFLOW_NAME }}' --share-name '${{ env.logicAppName }}'
-            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --share-name '${{ env.logicAppName }}' --path 'site/wwwroot/${{ secrets.WORKFLOW_NAME }}/workflow.json" --source ".\${{ secrets.WORKFLOW_NAME }}\workflow.json"
+            az storage file upload --account-name '${{ env.SA_NAME }}' --account-key '${{ env.SA_KEY }}' --share-name '${{ env.logicAppName }}' --path 'site/wwwroot/${{ secrets.WORKFLOW_NAME }}/workflow.json' --source './${{ secrets.WORKFLOW_NAME }}/workflow.json'
           azPSVersion: "latest"
 
       # RETRIEVE SAS KEY LOGIC APP WORKFLOW AND STORE IT IN APIM NAMED VALUE
