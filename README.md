@@ -19,7 +19,7 @@ To also enable a Web Application Firewall (WAF) in Front Door, I used [this](htt
 
 In my journey I ran into some networking related issue's. When you are deploying APIM in external mode, everything routes through the VNET. So, this means you still have to open some ports in the Network Security Groups attached to the APIM Subnet, in order to get API Management running appropiattely. Here is a [link](https://docs.microsoft.com/en-us/azure/api-management/api-management-using-with-vnet?tabs=stv2#control-plane-ip-addresses) which tells you which ports to open.
 
-For deployment I choose to do it all in Bicep templates. I haven't done a lot with Bicep yet, so it's about time I do. I got most of my examples from [here](https://github.com/Azure/bicep/tree/main/docs/examples).
+For deployment I choose to do it all in Bicep templates. I got most of my examples from [here](https://github.com/Azure/bicep/tree/main/docs/examples).
 
 For deploying the Logic App (Standard) via [Github Actions](https://github.com/Azure/logicapps/tree/master/github-sample).
 For deploying the Logic App (Standard) via [Azure DevOps](https://github.com/Azure/logicapps/tree/master/azure-devops-sample).
@@ -80,16 +80,18 @@ git clone https://github.com/pascalvanderheiden/ais-sync-pattern-la-std-vnet.git
 ```
 
 * Create a Logic App Standard locally
-Now everything is setup & ready to create your first workflow. In order to follow an agile development process I use [Visual Studio Code to create my Logic Apps (Standard)](https://docs.microsoft.com/en-us/azure/logic-apps/create-single-tenant-workflows-visual-studio-code) and I use Github to sync, share, deploy & collaborate my code.
 
-I've already prepared a simpel request and response workflow in this repository. Which we can deploy via Visual Studio Code or the Az Cli.
+Now everything is setup to create your first workflow. In order to follow an agile development process I use [Visual Studio Code to create my Logic Apps (Standard)](https://docs.microsoft.com/en-us/azure/logic-apps/create-single-tenant-workflows-visual-studio-code) and I use Github to sync, share, deploy & collaborate my code.
+
+I've already prepared a simple request and response workflow in this repository. Which we can deploy via Visual Studio Code or the Az Cli.
 
 ![ais-syc-pattern-la-std-vnet](docs/images/logic-app-designer.png)
 
 * Deploy it all by one script
+
 I've included all the steps in 1 Powershell script. This will create all the needed resources, and will deploy the Logic App and the API in API Management. Keep in mind that this will take a while to deploy.
 
-Due to lazyness I've used variables:
+I've used these variables:
 
 ```ps1
 $subscriptionId = "<subscription_id>"
@@ -108,6 +110,7 @@ $apimName = "<apim_name>"
 ```
 
 * Remove the APIM Soft-delete
+
 If you deleted the deployment via the Azure Portal, and you want to run this deployment again, you might run into the issue that the APIM name is still reserved because of the soft-delete feature. You can remove the soft-delete by using this script:
 
 ```ps1
@@ -115,9 +118,12 @@ If you deleted the deployment via the Azure Portal, and you want to run this dep
 ```
 
 * Testing
+
 I've included a tests.http file with relevant Test you can perform, to check if your deployment is successful.
 
 ## Deploy with Github Actions
+
+* Fork this repository
 
 * Generate a Service Principal
 
@@ -128,18 +134,19 @@ az ad sp create-for-rbac -n <name_sp>
 Copy the json output of this command.
 
 * Update GitHub Secrets for customizing your deployment
+
 In the repository go to 'Settings', on the left 'Secrets', 'Actions'.
 And pass the json output in the command used above into the secret 'AZURE_CREDENTIALS'.
 
 The following secrets need to be created:
 
--AZURE_SUBSCRIPTION_ID
--LOCATION
--DEPLOYMENT_NAME_BUILD
--DEPLOYMENT_NAME_RELEASE
--PREFIX
--API_NAME
--API_PATH
--WORKFLOW_NAME
+* AZURE_SUBSCRIPTION_ID
+* LOCATION
+* DEPLOYMENT_NAME_BUILD
+* DEPLOYMENT_NAME_RELEASE
+* PREFIX
+* API_NAME
+* API_PATH
+* WORKFLOW_NAME
 
 * Commit, and it will trigger your workflow.
