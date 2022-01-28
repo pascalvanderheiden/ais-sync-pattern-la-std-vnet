@@ -7,7 +7,7 @@ GET https://<namePrefix>-fd.azurefd.net/status-0123456789abcdef
 ### Test APIM Public Endpoint (should timeout after setting Network Sercurity Group rule on allowing only Inbound traffic from Front Door to APIM)
 GET https://<apim_name>.azure-api.net/echo/resource?param1=sample
 
-### Test APIM Echo API via Front Door
+### Test APIM Echo API via Front Door (remove the subscription key security for testing)
 GET https://<namePrefix>-fd.azurefd.net/echo/resource?param1=sample
 
 ### Test APIM endpoint with Logic App backend
