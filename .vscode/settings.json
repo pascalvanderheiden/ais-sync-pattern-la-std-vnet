@@ -4,5 +4,8 @@
     "azureLogicAppsStandard.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.suppressProject": true,
-    "azureLogicAppsStandard.preDeployTask": "publish"
+    "azureLogicAppsStandard.preDeployTask": "publish",
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow.json": "file:///c%3A/GitHub/ais-sync-pattern-la-std-vnet/.github/workflows/build.yml"
+    }
 }

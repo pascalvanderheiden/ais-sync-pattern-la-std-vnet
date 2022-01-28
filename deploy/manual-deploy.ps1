@@ -32,7 +32,7 @@ Connect-AzAccount
 Set-AzContext -Subscription $subscriptionId
 
 Write-Host "Deploy Infrastructure as Code:"
-New-AzSubscriptionDeployment -name $deploymentNameBuild -namePrefix $namePrefix -Location $location -TemplateFile $buildBicepPath
+New-AzSubscriptionDeployment -name $deploymentNameBuild -namePrefix $namePrefix -location $location -TemplateFile $buildBicepPath
 
 Write-Host "Retrieve API Management Instance Name:"
 $apimName = az apim list --resource-group $resourceGroup --subscription $subscriptionId --query "[].{Name:name}" -o tsv
