@@ -9,6 +9,7 @@ env:
   appInsightsName: '${{ secrets.PREFIX }}-ai'
   workflowPath: './${{ secrets.WORKFLOW_NAME }}'
   apimNameValueSig: '${{ secrets.WORKFLOW_NAME }}-sig'
+  frontDoorIdNamedValue: '${{ secrets.PREFIX }}-fd-id'
 
 on:
   # Only trigger, when the build workflow succeeded
@@ -91,7 +92,7 @@ jobs:
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            New-AzResourceGroupDeployment -Name '${{ secrets.DEPLOYMENT_NAME_RELEASE }}' -ResourceGroupName '${{ env.resourceGroup }}' -apimName '${{ env.APIM_NAME }}' -appInsightsName '${{ env.appInsightsName }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secrets.WORKFLOW_NAME }}' -workflowSigNamedValue '${{ env.apimNameValueSig }}' -apiName '${{ secrets.API_NAME }}' -apiPath '${{ secrets.API_PATH }}' -TemplateFile '${{ env.releaseBicepPath }}'
+            New-AzResourceGroupDeployment -Name '${{ secrets.DEPLOYMENT_NAME_RELEASE }}' -ResourceGroupName '${{ env.resourceGroup }}' -apimName '${{ env.APIM_NAME }}' -appInsightsName '${{ env.appInsightsName }}' -logicAppName '${{ env.logicAppName }}' -workflowName '${{ secrets.WORKFLOW_NAME }}' -workflowSigNamedValue '${{ env.apimNameValueSig }}' -frontDoorIdNamedValue '${{ env.frontDoorIdNamedValue }}' -apiName '${{ secrets.API_NAME }}' -apiPath '${{ secrets.API_PATH }}' -TemplateFile '${{ env.releaseBicepPath }}'
           azPSVersion: "latest"
 
       # LOGOUT

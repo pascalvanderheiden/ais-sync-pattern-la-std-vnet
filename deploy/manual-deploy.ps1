@@ -12,6 +12,8 @@ $appInsightsName = "$namePrefix-ai"
 $workflowPath = ".\$workflowName"
 $destinationPath = ".\deploy\release\$workflowName-deploy.zip"
 $apimNameValueSig = "$workflowName-sig"
+$frontDoorIdNamedValue = "$namePrefix-fd-id"
+
 Write-Host "Subscription id: "$subscriptionId
 Write-Host "Deployment Name Build: "$deploymentNameBuild
 Write-Host "Deployment Name Release: "$deploymentNameRelease
@@ -61,4 +63,4 @@ Write-Host "Retrieve SAS Key and store in API Management as Named Value:"
 .\deploy\release\get-saskey-from-logic-app.ps1 -subscriptionId $subscriptionId -resourceGroup $resourceGroup -logicAppName $logicAppName -workflowName $workflowName -apimName $apimName -apimNamedValueSig $apimNameValueSig
 
 Write-Host "Release API definition to API Management:"
-New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -appInsightsName $appInsightsName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -apiName $apiName -apiPath $apiPath -TemplateFile $releaseBicepPath
+New-AzResourceGroupDeployment -Name $deploymentNameRelease -ResourceGroupName $resourceGroup -apimName $apimName -appInsightsName $appInsightsName -logicAppName $logicAppName -workflowName $workflowName -workflowSigNamedValue $apimNameValueSig -frontDoorIdNamedValue $frontDoorIdNamedValue -apiName $apiName -apiPath $apiPath -TemplateFile $releaseBicepPath

@@ -2,6 +2,7 @@
 @maxLength(11)
 param namePrefix string
 param apimGwUrl string
+param apimName string
 
 var frontDoorEnabledState = true
 var healthProbe1EnabledState = true
@@ -20,6 +21,11 @@ var routingRule1Name = '${frontDoorNameLower}-apimRoutingRule1'
 
 var frontendEndpoint1hostName = '${frontDoorNameLower}.azurefd.net'
 var backendPool1TargetUrl = apimGwUrl
+var frontDoorIdNamedValue = '${frontDoorNameLower}-id'
+
+resource apiManagement 'Microsoft.ApiManagement/service@2020-12-01' existing = {
+  name: apimName
+}
 
 resource resAzFd 'Microsoft.Network/frontdoors@2020-01-01' = {
   name: frontDoorNameLower
@@ -163,6 +169,16 @@ resource resAzFdWaf 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2
         }
       ]
     }
+  }
+}
+
+resource fdIdApimNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
+  name: frontDoorIdNamedValue
+  parent: apiManagement
+  properties: {
+    displayName: frontDoorIdNamedValue
+    secret: true
+    value: resAzFd.id
   }
 }
 
