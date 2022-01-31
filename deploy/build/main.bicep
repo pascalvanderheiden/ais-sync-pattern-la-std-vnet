@@ -76,6 +76,7 @@ module frontDoorModule '../build/frontdoor_waf.bicep' = {
   params: {
     namePrefix: namePrefix
     apimGwUrl: '${apimModule.outputs.apimName}.azure-api.net'
+    apimName: apimModule.name
   }
   dependsOn:[
     apimModule
