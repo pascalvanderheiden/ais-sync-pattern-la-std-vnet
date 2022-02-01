@@ -178,7 +178,7 @@ resource fdIdApimNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08
   properties: {
     displayName: frontDoorIdNamedValue
     secret: true
-    value: resAzFd.id
+    value: resAzFd.properties.frontdoorId
   }
 }
 
