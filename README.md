@@ -25,6 +25,7 @@ For deploying the Logic App (Standard) via [Github Actions](https://github.com/A
 For deploying the Logic App (Standard) via [Azure DevOps](https://github.com/Azure/logicapps/tree/master/azure-devops-sample).
 
 Last but not least, I used Azure Storage to deploy the workflow to my Logic App. Because you can not reach the kudo endpoint for performing a zip deployment due to the fact that the ASE is a completely isolated environment, I used a file share to deploy the workflow. I based this strategy on this [blog](https://techcommunity.microsoft.com/t5/integrations-on-azure-blog/deploying-standard-logic-app-to-storage-account-behind-firewall/ba-p/2626286)
+An other approach for deploying the Logic App workflow within a isolated environment, is by setting up a build agent within the isolated environment.
 
 > At first I deployed this solution without the check-header policy. With only the NSG check on Frontdoor.Backend, you could setup your own Frontdoor and connect it directly to my APIM Instance, if you would had known the name of my instance. Quite often this name is pretty easy to guess. This security breach would be eliminated by adding a header check on the Front Door id in the X-Azure-FDID header. Kudo's to Remco Eissing for pointing that out to me.
 
