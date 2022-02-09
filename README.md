@@ -133,7 +133,7 @@ I've included a tests.http file with relevant Test you can perform, to check if 
 * Generate a Service Principal
 
 ```ps1
-az ad sp create-for-rbac -n <name_sp> 
+az ad sp create-for-rbac -n <name_sp> --sdk-auth
 ```
 
 Copy the json output of this command.
