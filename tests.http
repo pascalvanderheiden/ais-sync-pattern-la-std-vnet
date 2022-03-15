@@ -1,9 +1,10 @@
 @namePrefix = <your_prefix>
 @apimName = <your_apim_name>
-@yourSasKey = <your_local_logic_app_signature>
+@workflowName = <logic_app_workflow>
+@workflowSasKey = <workflow_local_logic_app_signature>
 
 ## Test Logic App API locally
-GET http://localhost:7071/api/<workflow_name>/triggers/manual/invoke?api-version=2020-05-01-preview&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig={{yourSasKey}}
+GET http://localhost:7071/api/{{workflowName}}/triggers/manual/invoke?api-version=2020-05-01-preview&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig={{workflowSasKey}}
 
 ### Test Front door health check for API Management backend
 GET https://{{namePrefix}}-fd.azurefd.net/status-0123456789abcdef

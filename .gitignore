@@ -1,8 +1,9 @@
-
-# Azure Functions artifacts
 bin
 obj
 appsettings.json
 local.settings.json
 local.deploy.ps1
 local.tests.http
+_azurite*
+__blobstorage__
+.debug
