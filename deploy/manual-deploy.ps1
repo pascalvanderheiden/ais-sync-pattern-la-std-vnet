@@ -1,7 +1,5 @@
 param ($subscriptionId, $deploymentNameBuild, $deploymentNameRelease, $namePrefix, $workflowName, $apiName, $apiPath)
 
-invoke-restmethod -uri "https://artii.herokuapp.com/make?text=Azure-Deploy&font=speed" -DisableKeepAlive
-
 Write-Host "Setting the paramaters:"
 $location = "West Europe"
 $resourceGroup = "$namePrefix-rg"
